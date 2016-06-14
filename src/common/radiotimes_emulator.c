@@ -10,7 +10,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <errno.h>
-#include <pthread.h>
 #include <signal.h>
 #include <malloc.h>
 
@@ -52,7 +51,6 @@ static volatile bool stop = false;
 static volatile bool exec = false;
 static volatile bool quit = false;
 static volatile bool timeout_enable = true;
-pthread_mutex_t mutex;
 int timeout = 0;
 
 bool iactive = false;

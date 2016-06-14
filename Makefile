@@ -28,7 +28,7 @@ $(DOWNLOADER_OBJS):
 	$(CC) $(CFLAGS) -c -o $@ $(@:.o=.c)
 
 $(DOWNLOADER_BIN): $(OBJS) $(DOWNLOADER_OBJS)
-	$(CC) $(LDFLAGS) -o $@ $(OBJS) $(DOWNLOADER_OBJS) -lz -lm -lpthread
+	$(CC) $(LDFLAGS) -o $@ $(OBJS) $(DOWNLOADER_OBJS)
 	$(STRIP) $@
 
 clean:
