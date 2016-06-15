@@ -22,7 +22,7 @@ typedef struct epgdb_title_s
 	uint16_t	description_length;
 	uint16_t	long_description_length;
 	uint8_t		revision;
-	unsigned char	program[64];
+	char		program[64];
 
 	/* other elements */
 	bool					changed;

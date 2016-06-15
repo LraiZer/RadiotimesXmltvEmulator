@@ -202,7 +202,7 @@ void opentv_read_summaries (unsigned char *data, unsigned int length, bool huffm
 			unsigned short int event_id;
 			int packet_length = ((data[offset + 2] & 0x0f) << 8) | data[offset + 3];
 			int packet_length2 = packet_length;
-			char buffer[MAX_SUMMARIE_SIZE];
+			unsigned char buffer[MAX_SUMMARIE_SIZE];
 			unsigned short int buffer_size = 0;
 			unsigned int offset2;
 
