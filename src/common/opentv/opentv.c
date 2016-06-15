@@ -332,7 +332,7 @@ bool opentv_read_themes (char *file)
 		return false;
 	}
 
-	int i,genre_id = 0;
+	int genre_id = 0;
 	char string1[256];
 	char string2[256];
 

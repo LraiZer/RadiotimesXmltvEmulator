@@ -16,8 +16,6 @@ BIN_DIR = bin
 
 TARGET_ARCH ?= mips
 
-CFLAGS += -Wall -Werror -g
-
 all: clean $(DOWNLOADER_BIN)
 
 $(BIN_DIR):
