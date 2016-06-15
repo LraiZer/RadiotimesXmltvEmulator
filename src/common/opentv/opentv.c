@@ -24,7 +24,7 @@ static int tit_count;
 
 void removeSubstring(char *s,const char *toremove)
 {
-  while( s=strstr(s,toremove) )
+  while( (s=strstr(s,toremove)) )
     memmove(s,s+strlen(toremove),1+strlen(s+strlen(toremove)));
 }
 
