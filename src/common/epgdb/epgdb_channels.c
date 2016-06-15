@@ -42,7 +42,6 @@ epgdb_channel_t *epgdb_channels_get_by_freq (unsigned short int nid, unsigned sh
 	
 	while (tmp != NULL)
 	{
-		int i;
 		if ((nid == tmp->nid) && (tsid == tmp->tsid) && (sid == tmp->sid)) return tmp;
 		
 		tmp = tmp->next;

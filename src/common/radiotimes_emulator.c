@@ -274,7 +274,6 @@ opentv_stop:
 
 void *download (void *args)
 {
-	int i;
 	char opentv_file[256];
 
 	sprintf (opentv_file, "%s/providers/%s.conf", homedir, provider);
@@ -398,7 +397,6 @@ int main (int argc, char **argv)
 		log_add ("Cannot load provider configuration (%s)", opentv_file);
 	
 	memory_stats ();
-error:
 	log_close ();
 	return 0;
 }
