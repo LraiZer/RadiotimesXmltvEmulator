@@ -165,7 +165,7 @@ void opentv_read_titles (unsigned char *data, unsigned int length, bool huffman_
 				if (!huffman_decode (data + offset + 9, description_length, tmp, MAX_TITLE_SIZE * 2, huffman_debug))
 					tmp[0] = '\0';
 				else
-					tmp[64] = '\0';
+					tmp[35] = '\0';
 
 				strcpy(title->program, tmp);
 				title = epgdb_titles_add (channels[channel_id], title);
