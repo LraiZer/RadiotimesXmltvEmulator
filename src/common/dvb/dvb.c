@@ -16,6 +16,23 @@
 #define dmx_sct_filter_params dmxSctFilterParams
 #else
 #include <linux/dvb/dmx.h>
+/*
+	get rid of DMX_SET_SOURCE patch dmx.h v4.17
+	id=13adefbe9e566c6db91579e4ce17f1e5193d6f2c
+*/
+#ifndef DMX_SET_SOURCE
+typedef enum dmx_source {
+	DMX_SOURCE_FRONT0 = 0,
+	DMX_SOURCE_FRONT1,
+	DMX_SOURCE_FRONT2,
+	DMX_SOURCE_FRONT3,
+	DMX_SOURCE_DVR0   = 16,
+	DMX_SOURCE_DVR1,
+	DMX_SOURCE_DVR2,
+	DMX_SOURCE_DVR3
+} dmx_source_t;
+#define DMX_SET_SOURCE	_IOW('o', 49, dmx_source_t)
+#endif
 #endif
 
 #include "../../common.h"
