@@ -3,6 +3,7 @@
 
 typedef enum type_bool {false = 0, true} bool;
 
+#define NO_DVB_POLL true
 #define MAX_OTV_LOOP_CYCLES	90000
 #define MAX_BAT_LOOP_CYCLES	200
 #define DEFAULT_LOG_FILE	"/tmp/radiotimes.log"
