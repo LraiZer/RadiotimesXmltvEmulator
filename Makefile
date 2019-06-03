@@ -1,5 +1,6 @@
 OBJS += src/common/memory.o
 OBJS += src/common/core/log.o
+OBJS += src/common/core/dvb_text.o
 OBJS += src/common/dvb/dvb.o
 OBJS += src/common/opentv/opentv.o
 OBJS += src/common/opentv/huffman.o
@@ -15,6 +16,8 @@ DOWNLOADER_BIN = bin/radiotimes_emulator
 BIN_DIR = bin
 
 TARGET_ARCH ?= mips
+
+#CFLAGS += -g -Wall -Werror
 
 all: clean $(DOWNLOADER_BIN)
 

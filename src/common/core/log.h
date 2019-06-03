@@ -3,6 +3,7 @@
 
 void log_enable ();
 void log_disable ();
+bool log_new (char *db_root);
 bool log_open (char *db_root);
 void log_banner (char *app_name);
 void log_close ();

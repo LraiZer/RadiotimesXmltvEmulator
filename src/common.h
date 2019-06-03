@@ -3,18 +3,19 @@
 
 typedef enum type_bool {false = 0, true} bool;
 
-#define NO_DVB_POLL true
 #define MAX_OTV_LOOP_CYCLES	90000
 #define MAX_BAT_LOOP_CYCLES	200
 #define DEFAULT_LOG_FILE	"/tmp/radiotimes.log"
 
-#define DEFAULT_OTV_PROVIDER	"skyuk_astra2_28.2"
+#define DEFAULT_OTV_PROVIDER	"skyuk_28.2"
 
-#define DEFAULT_DB_ROOT		"/tmp/radiotimes"
+#define DEFAULT_DB_ROOT		"/tmp/xmltv"
 
 #define DEFAULT_DEMUXER		"/dev/dvb/adapter0/demux0"
 
-// #define MEMORYMON true
+char provider[256];
+
+//#define MEMORYMON true
 
 #ifdef MEMORYMON
 void *_malloc (unsigned int size);

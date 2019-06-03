@@ -3,9 +3,12 @@
 #include <memory.h>
 #include <malloc.h>
 #include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "../../common.h"
 #include "../core/log.h"
+#include "../providers/providers.h"
 
 #include "huffman.h"
 #include "opentv.h"
@@ -13,9 +16,10 @@
 #include "../epgdb/epgdb_channels.h"
 #include "../epgdb/epgdb_titles.h"
 
-#define MAX_TITLE_SIZE		256
-#define MAX_SUMMARIE_SIZE	16384
-#define MAX_CHANNELS		65536
+#define MAX_GENRE_SIZE		0xFF
+#define MAX_TITLE_SIZE		0xFF
+#define MAX_SUMMARIE_SIZE	0x3FFF
+#define MAX_CHANNELS		0xFFFF
 
 static epgdb_channel_t *channels[MAX_CHANNELS];
 
@@ -28,6 +32,26 @@ void removeSubstring(char *s,const char *toremove)
     memmove(s,s+strlen(toremove),1+strlen(s+strlen(toremove)));
 }
 
+char *replace_Substring(char *str, char *orig, char *rep, int start)
+{
+	static char temp[4096];
+	static char buffer[4096];
+	char *p;
+
+	strcpy(temp, str + start);
+
+	if(!(p = strstr(temp, orig)))
+		return temp;
+
+	strncpy(buffer, temp, p-temp);
+	buffer[p-temp] = '\0';
+
+	sprintf(buffer + (p - temp), "%s%s", rep, p + strlen(orig));
+	sprintf(str + start, "%s", buffer);
+
+	return str;
+}
+
 void opentv_init ()
 {
 	int i;
@@ -35,7 +59,7 @@ void opentv_init ()
 	tit_count = 0;
 	for (i=0; i<MAX_CHANNELS; i++)
 		channels[i] = NULL;
-	for (i=0; i<256; i++)
+	for (i=0; i<MAX_GENRE_SIZE; i++)
 		genre[i] = NULL;
 }
 
@@ -56,15 +80,21 @@ bool opentv_read_channels_bat (unsigned char *data, unsigned int length, char *d
 	unsigned short int bouquet_descriptors_length = ((data[8] & 0x0f) << 8) | data[9];
 	unsigned short int transport_stream_loop_length = ((data[bouquet_descriptors_length + 10] & 0x0f) << 8) | data[bouquet_descriptors_length + 11];
 	unsigned int offset1 = bouquet_descriptors_length + 12;
+	unsigned int name_space = providers_get_orbital_position() << 16;
 	bool ret = false;
-	
+
 	while (transport_stream_loop_length > 0)
 	{
 		unsigned short int tid = (data[offset1] << 8) | data[offset1 + 1];
 		unsigned short int nid = (data[offset1 + 2] << 8) | data[offset1 + 3];
 		unsigned short int transport_descriptor_length = ((data[offset1 + 4] & 0x0f) << 8) | data[offset1 + 5];
 		unsigned int offset2 = offset1 + 6;
-		
+
+		// 7e3 tsid is unique in Enigma2 hardcoding for 282, we dont pull transponder data so hardcode current :(
+		// Transport.name_space |= ((Transport.frequency/1000)*10) + Transport.polarization
+		if (nid== 0x2 && tid == 0x7e3)
+			name_space |= 0x2f26;
+
 		offset1 += (transport_descriptor_length + 6);
 		transport_stream_loop_length -= (transport_descriptor_length + 6);
 		
@@ -98,12 +128,17 @@ bool opentv_read_channels_bat (unsigned char *data, unsigned int length, char *d
 						FILE *outfile;
 						char name_file[256];
 						memset(name_file, '\0', 256);
-						sprintf(name_file, "%s/channels.dat", db_root);
+						sprintf(name_file, "%s/%s.channels.xml", db_root, provider);
 						outfile = fopen(name_file,"a");
-
-						fprintf(outfile,"%i|%x:%x:%x\n",
-							channel_id,
-							nid, tid, sid);
+						fprintf(outfile,"<!-- %s --><channel id=\"%i_%i_%i\">1:0:%x:%x:%x:%x:%x:0:0:0:</channel><!-- \"%i\" -->\n",
+							provider,
+							providers_get_orbital_position(), nid, channel_id,
+							type_id,
+							sid,
+							tid,
+							nid,
+							name_space,
+							channel_id);
 						fflush(outfile);
 						fclose(outfile);
 
@@ -111,7 +146,7 @@ bool opentv_read_channels_bat (unsigned char *data, unsigned int length, char *d
 						ch_count++;
 						ret = true;
 					}
-					
+
 					offset3 += 9;
 					descriptor_length -= 9;
 				}
@@ -142,7 +177,7 @@ void opentv_read_titles (unsigned char *data, unsigned int length, bool huffman_
 			unsigned char description_length;
 			unsigned short int packet_length = ((data[offset + 2] & 0x0f) << 8) | data[offset + 3];
 			
-			if ((data[offset + 4] != 0xb5) || ((packet_length + offset) > length)) break;
+			if ((data[offset + 4] != 0xb5) || ((packet_length + offset) > length)) break;// || channel_id != 4191
 			
 			event_id = (data[offset] << 8) | data[offset + 1];
 			offset += 4;
@@ -285,29 +320,51 @@ void opentv_read_summaries (unsigned char *data, unsigned int length, bool huffm
 	The Bounty Hunter~~~2010~Andy Tennant~Milo Boyd*Gerard Butler|Nicole Hurley*Jennifer Aniston~false~true~false~true~true~false~false~false~2~12~Film~Cop-turned-bounty hunter is assigned to track down his bail-jumping reporter ex-wife. They are in turn pursued by crooked detectives who fear the feisty Nicole is getting too close to the truth.~false~19/05/2011~10:00~12:00~120
 	Family Show~~~~~~false~false~false~false~true~false~false~false~~~Entertainment~The latest films from the UK and the US.~false~19/05/2011~12:00~12:30~30
 */
-					char mtime_s[20];
-					struct tm *loctime_s = localtime ((time_t*)&title->start_time);
-					strftime (mtime_s, 20, "%d/%m/%Y~%H:%M", loctime_s);
 
-					char mtime_e[20];
+/*
+					// Keep current timestamp, we write the localtime() +0000/+0100 offset %z
+					// OR convert to GMT, should set timestamp and localtime offset to +0000?
+
+					char mtime_s[256];
+					memset(mtime_s, '\0', 256);
+					struct tm *loctime_s, *gmtime_s;
+					loctime_s = localtime((time_t*)&title->start_time);
+					time_t mytime_s = mktime(loctime_s);
+					gmtime_s = gmtime(&mytime_s);
+					strftime (mtime_s, sizeof(mtime_s), "%Y%m%d%H%M%S %z", gmtime_s);
+
+					char mtime_e[256];
+					struct tm *loctime_e, *gmtime_e;
+					memset(mtime_e, '\0', 256);
+					uint32_t endt = title->start_time + title->length;
+					loctime_e = localtime((time_t*)&endt);
+					time_t mytime_e = mktime(loctime_e);
+					gmtime_e = gmtime(&mytime_e);
+					strftime (mtime_e, sizeof(mtime_e), "%Y%m%d%H%M%S %z", gmtime_e);
+*/
+
+					char mtime_s[256];
+					memset(mtime_s, '\0', 256);
+					struct tm *loctime_s = localtime ((time_t*)&title->start_time);
+					strftime (mtime_s, sizeof(mtime_s), "%Y%m%d%H%M%S %z", loctime_s);
+
+					char mtime_e[256];
+					memset(mtime_e, '\0', 256);
 					uint32_t endt;
 					endt = (title->start_time + title->length);
 					struct tm *loctime_e = localtime ((time_t*)&endt);
-					strftime (mtime_e, 10, "%H:%M", loctime_e);
+					strftime (mtime_e, sizeof(mtime_e), "%Y%m%d%H%M%S %z", loctime_e);
 
 					FILE *outfile;
 					char name_file[256];
 					memset(name_file, '\0', 256);
-					sprintf(name_file, "%s/%i.dat", db_root, channel_id);
+					sprintf(name_file, "%s/%s.xml", db_root, provider);
 					outfile = fopen(name_file,"a");
-
-					fprintf(outfile,"%s~~~~~~~~~~~~~~~~%s~%s~~%s~%s~%i\n",
-						title->program,
-						genre[title->genre_id],
-						tmp,
-						mtime_s,
-						mtime_e,
-						(title->length / 60));
+					fprintf(outfile, " <programme start=\"%s\" stop=\"%s\" channel=\"%i_%i_%i\">\n", mtime_s, mtime_e, providers_get_orbital_position(), channels[channel_id]->nid, channel_id);
+					fprintf(outfile, "  <title>%s</title>\n", xmlify(title->program, strlen(title->program)));
+					fprintf(outfile, "  <sub-title>%s</sub-title>\n", xmlify(genre[title->genre_id], strlen(genre[title->genre_id])));
+					fprintf(outfile, "  <desc>%s</desc>\n", xmlify(tmp, strlen(tmp)));
+					fprintf(outfile, " </programme>\n");
 					fflush(outfile);
 					fclose(outfile);
 

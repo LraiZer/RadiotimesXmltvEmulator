@@ -60,7 +60,7 @@ bool huffman_debug_summaries = false;
 
 char *db_root = DEFAULT_DB_ROOT;
 char demuxer[256];
-char provider[256];
+//char provider[256];
 char homedir[256];
 int frontend = 0;
 
@@ -161,7 +161,7 @@ void download_opentv ()
 	char dictionary[256];
 	char themes[256];
 
-	log_add ("Started RadioTimes XMLTV emulation");
+	log_add ("Started RadioTimes XMLTV (e2xmltv) emulation");
 	log_add ("Started OpenTV events download");
 
 	sprintf (dictionary, "%s/providers/%s.dict", homedir, provider);
@@ -171,118 +171,163 @@ void download_opentv ()
 	if (huffman_read_dictionary (dictionary) && opentv_read_themes (themes))
 	{
 		char size[256];
-	
-		settings.pids = providers_get_channels_pids ();
-		settings.pids_count = providers_get_channels_pids_count ();
+
 		settings.demuxer = demuxer;
 		settings.frontend = frontend;
-		settings.min_length = 11;
 		settings.buffer_size = 4 * 1024;
-		settings.filter = 0x4a;
+
+		settings.min_length = 11;
+		settings.filter[0] = 0x4a;
 		settings.mask = 0xff;
-	
+		settings.pid = 0x11;
+
 		log_add ("Reading channels...");
+
+		FILE *outfile;
+		char name_file[256];
+		memset(name_file, '\0', 256);
+		sprintf(name_file, "%s/%s.channels.xml", db_root, provider);
+		outfile = fopen(name_file,"w");
+		fprintf(outfile,"<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n<channels>\n");
+		fflush(outfile);
+		fclose(outfile);
+
 		dvb_read (&settings, *bat_callback);
+
+		outfile = fopen(name_file,"a");
+		fprintf(outfile,"</channels>\n");
+		fflush(outfile);
+		fclose(outfile);
+
+		memset(name_file, '\0', 256);
+		sprintf(name_file, "%s/%s.xml", db_root, provider);
+		outfile = fopen(name_file,"w");
+		fprintf(outfile,"<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n");
+		fprintf(outfile,"<tv generator-info-name=\"RadiotimesXmltv Emulator -(alpha test)- BRANCH{e2xmltv}\"");
+		fprintf(outfile," generator-info-url=\"https://github.com/LraiZer/RadiotimesXmltvEmulator{BRANCH}\">\n");
+		fflush(outfile);
+		fclose(outfile);
+
+		memset(name_file, '\0', 256);
+		sprintf(name_file, "%s/otv_%s.sources.xml", db_root, provider);
+		outfile = fopen(name_file,"w");
+		fprintf(outfile,"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<sources>\n");
+		fprintf(outfile," <!-- \n xmltv generator\"RadiotimesXmltv Emulator (alpha test) BRANCH{e2xmltv}\"\n");
+		fprintf(outfile," generator-info-url=\"https://github.com/LraiZer/RadiotimesXmltvEmulator{BRANCH}\"\n --> \n");
+		fprintf(outfile,"\t<mappings>\n\t\t<channel name=\"%s.channels.xml\">\n\t\t\t<url>%s/%s.channels.xml</url>\n", provider, db_root, provider);
+		fprintf(outfile,"\t\t</channel>\n\t</mappings>\n\t<sourcecat sourcecatname=\"RadioTimes Emulator %s XMLTV\">\n", provider);
+		fprintf(outfile,"\t\t<source type=\"gen_xmltv\" channels=\"%s.channels.xml\">\n\t\t\t<description>OpenTv (%s.xml)</description>\n", provider, provider);
+		fprintf(outfile,"\t\t\t<url>%s/%s.xml</url>\n\t\t</source>\n\t</sourcecat>\n</sources>\n", db_root, provider);
+		fflush(outfile);
+		fclose(outfile);
+
 		print_meminfo ();
 		log_add ("Read %d channels", opentv_channels_count ());
 		if (stop) goto opentv_stop;
-	
-		settings.pids = providers_get_titles_pids ();
-		settings.pids_count = providers_get_titles_pids_count ();
-		settings.demuxer = demuxer;
-		settings.frontend = frontend;
+
 		settings.min_length = 20;
-		settings.buffer_size = 4 * 1024;
-		settings.filter = 0xa0;
-		settings.mask = 0xfc;
-	
-		buffer_index = 0;
-		buffer_size = 0;
-		buffer_size_last = 0;
-		log_add ("Reading titles...");
-		dvb_read (&settings, *opentv_titles_callback);
-		print_meminfo ();
-		format_size (size, buffer_size);
-		log_add ("Read %s", size);
-		if (stop) goto opentv_stop;
-	
-		log_add ("Parsing titles...");
-		buffer_size = 0;
-		time_t lasttime = 0;
-		for (i=0; i<buffer_index; i++)
+		int pid;
+
+		for (pid=0x30; pid<=0x37; pid++)
 		{
-			if (!stop) opentv_read_titles (buffer[i].data, buffer[i].size, huffman_debug_titles);
-			buffer_size += buffer[i].size;
-			_free (buffer[i].data);
-			if ((i % 100) == 0)
+			settings.filter[0] = 0xa0;
+			settings.mask = 0xfc;
+			settings.pid = pid;
+
+			buffer_index = 0;
+			buffer_size = 0;
+			buffer_size_last = 0;
+			log_add ("Reading titles...");
+			dvb_read (&settings, *opentv_titles_callback);
+			print_meminfo ();
+			format_size (size, buffer_size);
+			log_add ("Read %s", size);
+			if (stop) goto opentv_stop;
+
+			log_add ("Parsing titles...");
+			buffer_size = 0;
+			time_t lasttime = 0;
+			for (i=0; i<buffer_index; i++)
 			{
-				if (lasttime != time (NULL) || (i == buffer_index-1))
+				if (!stop) opentv_read_titles (buffer[i].data, buffer[i].size, huffman_debug_titles);
+				buffer_size += buffer[i].size;
+				_free (buffer[i].data);
+				if ((i % 100) == 0)
 				{
-					lasttime = time (NULL);
-					format_size (size, buffer_size);
-					if (iactive)
+					if (lasttime != time (NULL) || (i == buffer_index-1))
 					{
-						log_add ("Parsing.. %s", size);
-						log_add ("Progress %%%d", (i*100)/buffer_index);
+						lasttime = time (NULL);
+						format_size (size, buffer_size);
+						if (iactive)
+						{
+							log_add ("Parsing.. %s", size);
+							log_add ("Progress %%%d", (i*100)/buffer_index);
+						}
+						print_meminfo ();
 					}
-					print_meminfo ();
 				}
 			}
-		}
-		format_size (size, buffer_size);
-		log_add ("Parsed %s", size);
-		log_add ("Titles parsed");
-		if (stop) goto opentv_stop;
-	
-		settings.pids = providers_get_summaries_pids ();
-		settings.pids_count = providers_get_summaries_pids_count ();
-		settings.demuxer = demuxer;
-		settings.frontend = frontend;
-		settings.min_length = 20;
-		settings.buffer_size = 4 * 1024;
-		settings.filter = 0xa8;
-		settings.mask = 0xfc;
-	
-		buffer_index = 0;
-		buffer_size = 0;
-		buffer_size_last = 0;
-		log_add ("Reading summaries...");
-		dvb_read (&settings, *opentv_summaries_callback);
-		print_meminfo ();
-		format_size (size, buffer_size);
-		log_add ("Read %s", size);
-		if (stop) goto opentv_stop;
-	
-		log_add ("Parsing summaries...");
-		buffer_size = 0;
-		lasttime = 0;
-		for (i=0; i<buffer_index; i++)
-		{
-			if (!stop) opentv_read_summaries (buffer[i].data, buffer[i].size, huffman_debug_summaries, db_root);
-			buffer_size += buffer[i].size;
-			_free (buffer[i].data);
-			if ((i % 100) == 0)
+			format_size (size, buffer_size);
+			print_meminfo ();
+			log_add ("Parsed %s", size);
+			log_add ("Titles parsed");
+
+			if (stop) goto opentv_stop;
+
+			settings.filter[0] = 0xa8;
+			settings.mask = 0xfc;
+			settings.pid = pid+0x10;
+
+			buffer_index = 0;
+			buffer_size = 0;
+			buffer_size_last = 0;
+			log_add ("Reading summaries...");
+			dvb_read (&settings, *opentv_summaries_callback);
+			print_meminfo ();
+			format_size (size, buffer_size);
+			print_meminfo ();
+			log_add ("Read %s", size);
+			if (stop) goto opentv_stop;
+
+			log_add ("Parsing summaries...");
+			buffer_size = 0;
+			lasttime = 0;
+			for (i=0; i<buffer_index; i++)
 			{
-				if (lasttime != time (NULL) || (i == buffer_index-1))
+				if (!stop) opentv_read_summaries (buffer[i].data, buffer[i].size, huffman_debug_summaries, db_root);
+				buffer_size += buffer[i].size;
+				_free (buffer[i].data);
+				if ((i % 100) == 0)
 				{
-					lasttime = time (NULL);
-					format_size (size, buffer_size);
-					if (iactive)
+					if (lasttime != time (NULL) || (i == buffer_index-1))
 					{
-						log_add ("Parsing.. %s", size);
-						log_add ("Progress %%%d", (i*100)/buffer_index);
+						lasttime = time (NULL);
+						format_size (size, buffer_size);
+						if (iactive)
+						{
+							log_add ("Parsing.. %s", size);
+							log_add ("Progress %%%d", (i*100)/buffer_index);
+						}
+						print_meminfo ();
 					}
-					print_meminfo ();
 				}
 			}
+			format_size (size, buffer_size);
+			print_meminfo ();
+			log_add ("Parsed %s", size);
+			log_add ("Summaries parsed");
 		}
-		format_size (size, buffer_size);
-		log_add ("Parsed %s", size);
-		log_add ("Summaries parsed");
 opentv_stop:
 		huffman_free_dictionary ();
 		epgdb_clean ();
 		opentv_cleanup();
+
+		memset(name_file, '\0', 256);
+		sprintf(name_file, "%s/%s.xml", db_root, provider);
+		outfile = fopen(name_file,"a");
+		fprintf(outfile,"</tv>\n");
+		fflush(outfile);
+		fclose(outfile);
 	}
 
 	exec = false;
@@ -297,15 +342,7 @@ void *download (void *args)
 
 	if (providers_read (opentv_file))
 	{
-		if (providers_get_protocol () == 1)
-		{
-			download_opentv ();
-		}
-		else
-		{
-			log_add ("invalid provider");
-			exec = false;
-		}
+		download_opentv ();
 	}
 	else
 	{
@@ -392,7 +429,8 @@ int main (int argc, char **argv)
 	while (db_root[strlen (db_root) - 1] == '/') db_root[strlen (db_root) - 1] = '\0';
 	
 	mkdir (db_root, S_IRWXU|S_IRWXG|S_IRWXO);
-	
+
+	log_new (db_root);
 	log_open (db_root);
 	log_banner ("RadioTimes XMLTV Emulator");
 
@@ -402,13 +440,10 @@ int main (int argc, char **argv)
 	sprintf (opentv_file, "%s/providers/%s.conf", homedir, provider);
 	if (providers_read (opentv_file))
 	{
-		if (providers_get_protocol () == 1)
-		{
-			log_add ("Provider %s identified as opentv", provider);
-			download_opentv ();
-			epgdb_clean ();
-			print_meminfo ();
-		}
+		log_add ("Provider %s opentv configured", provider);
+		download_opentv ();
+		epgdb_clean ();
+		print_meminfo ();
 	}
 	else
 		log_add ("Cannot load provider configuration (%s)", opentv_file);

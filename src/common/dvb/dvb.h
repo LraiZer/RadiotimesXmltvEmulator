@@ -9,13 +9,12 @@ typedef struct buffer_s
 
 typedef struct dvb_s
 {
-	int		*pids;
-	unsigned int	pids_count;
+	int		pid;
 	char		*demuxer;
 	int		frontend;
 	unsigned int	min_length;
 	unsigned int	buffer_size;
-	unsigned char	filter;
+	unsigned char	filter[DMX_FILTER_SIZE];
 	unsigned char	mask;
 } dvb_t;
 
