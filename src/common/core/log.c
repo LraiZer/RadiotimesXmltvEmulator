@@ -42,7 +42,7 @@ bool log_open (char *db_root)
 
 void log_banner (char *app_name)
 {
-	log_add ("\n\nRadiotimesXmltv Emulator -(alpha test)- BRANCH{e2xmltv}\nSources https://github.com/LraiZer/RadiotimesXmltvEmulator\n");
+	log_add ("\n\nRadiotimesXmltv Emulator -(beta)- BRANCH{e2xmltv}\nSources https://github.com/LraiZer/RadiotimesXmltvEmulator\n");
 	log_add ("\nBased on SIFTeam Crossepg (c) 2009-2014 Sandro Cavazzoni\nSources https://github.com/oe-alliance/e2openplugin-CrossEPG\n");
 	log_add ("\nSource credits: crossepg, tv_grab_dvb\n");
 	log_add ("\nThis software is distributed under the terms of the,\nGNU Lesser General Public License v2.1\n");
