@@ -80,11 +80,11 @@ bool opentv_read_channels_bat (unsigned char *data, unsigned int length, char *d
 	unsigned short int bouquet_descriptors_length = ((data[8] & 0x0f) << 8) | data[9];
 	unsigned short int transport_stream_loop_length = ((data[bouquet_descriptors_length + 10] & 0x0f) << 8) | data[bouquet_descriptors_length + 11];
 	unsigned int offset1 = bouquet_descriptors_length + 12;
-	unsigned int name_space = providers_get_orbital_position() << 16;
 	bool ret = false;
 
 	while (transport_stream_loop_length > 0)
 	{
+		unsigned int name_space = providers_get_orbital_position() << 16;
 		unsigned short int tid = (data[offset1] << 8) | data[offset1 + 1];
 		unsigned short int nid = (data[offset1 + 2] << 8) | data[offset1 + 3];
 		unsigned short int transport_descriptor_length = ((data[offset1 + 4] & 0x0f) << 8) | data[offset1 + 5];
@@ -92,7 +92,7 @@ bool opentv_read_channels_bat (unsigned char *data, unsigned int length, char *d
 
 		// 7e3 tsid is unique in Enigma2 hardcoding for 282, we dont pull transponder data so hardcode current :(
 		// Transport.name_space |= ((Transport.frequency/1000)*10) + Transport.polarization
-		if (nid== 0x2 && tid == 0x7e3)
+		if (nid == 0x2 && tid == 0x7e3)
 			name_space |= 0x2f26;
 
 		offset1 += (transport_descriptor_length + 6);
