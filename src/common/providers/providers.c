@@ -10,6 +10,12 @@
 
 #include "providers.h"
 
+static int channels_pids[1] = {0x11};
+static int channels_pids_count = 1;
+static int titles_pids[8] = {0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37};
+static int titles_pids_count = 8;
+static int summaries_pids[8] = {0x40,0x41,0x42,0x43,0x44,0x45,0x46,0x47};
+static int summaries_pids_count = 8;
 static int channels_types[64];
 static int channels_types_count = 0;
 static int nid = 0;
@@ -17,11 +23,17 @@ static int tsid = 0;
 static int sid = 0;
 static int orbital_position = 0;
 
-int  *providers_get_channels_types() { return channels_types; }
-int  providers_get_channels_types_count() { return channels_types_count; }
+int  *providers_get_channels_pids() { return channels_pids;}
+int  *providers_get_titles_pids() { return titles_pids;}
+int  *providers_get_summaries_pids() { return summaries_pids;}
+int  *providers_get_channels_types() { return channels_types;}
 int  providers_get_nid() { return nid; }
 int  providers_get_tsid() { return tsid; }
 int  providers_get_sid() { return sid; }
+int  providers_get_channels_pids_count() { return channels_pids_count;}
+int  providers_get_titles_pids_count() { return titles_pids_count;}
+int  providers_get_summaries_pids_count() { return summaries_pids_count;}
+int  providers_get_channels_types_count() { return channels_types_count;}
 int  providers_get_orbital_position() { return orbital_position; }
 
 static char *providers_trim_spaces (char *text)

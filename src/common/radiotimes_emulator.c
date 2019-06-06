@@ -162,7 +162,7 @@ void download_opentv ()
 	char themes[256];
 
 	log_add ("Started RadioTimes XMLTV (e2xmltv) emulation");
-	log_add ("Started OpenTV events download");
+	log_add ("Started OpenTV events download, DVB poll %s\n", no_dvb_poll ? "disabled" : "enabled");
 
 	sprintf (dictionary, "%s/providers/%s.dict", homedir, provider);
 	sprintf (themes, "%s/providers/%s.themes", homedir, provider);
@@ -177,9 +177,11 @@ void download_opentv ()
 		settings.buffer_size = 4 * 1024;
 
 		settings.min_length = 11;
-		settings.filter[0] = 0x4a;
+		settings.filter = 0x4a;
 		settings.mask = 0xff;
 		settings.pid = 0x11;
+		settings.pids = providers_get_channels_pids();
+		settings.pids_count = providers_get_channels_pids_count();
 
 		log_add ("Reading channels...");
 
@@ -230,9 +232,12 @@ void download_opentv ()
 
 		for (pid=0x30; pid<=0x37; pid++)
 		{
-			settings.filter[0] = 0xa0;
+			settings.min_length = 20;
+			settings.filter = 0xa0;
 			settings.mask = 0xfc;
 			settings.pid = pid;
+			settings.pids = providers_get_titles_pids ();
+			settings.pids_count = providers_get_titles_pids_count ();
 
 			buffer_index = 0;
 			buffer_size = 0;
@@ -274,9 +279,11 @@ void download_opentv ()
 
 			if (stop) goto opentv_stop;
 
-			settings.filter[0] = 0xa8;
+			settings.filter = 0xa8;
 			settings.mask = 0xfc;
 			settings.pid = pid+0x10;
+			settings.pids = providers_get_summaries_pids();
+			settings.pids_count = providers_get_summaries_pids_count();
 
 			buffer_index = 0;
 			buffer_size = 0;
@@ -316,6 +323,8 @@ void download_opentv ()
 			print_meminfo ();
 			log_add ("Parsed %s", size);
 			log_add ("Summaries parsed");
+
+			if (!no_dvb_poll) break;
 		}
 opentv_stop:
 		huffman_free_dictionary ();
@@ -370,7 +379,7 @@ int main (int argc, char **argv)
 	strcpy (demuxer, DEFAULT_DEMUXER);
 	strcpy (provider, DEFAULT_OTV_PROVIDER);
 
-	while ((c = getopt (argc, argv, "h:d:x:f:l:p:k:ryz")) != -1)
+	while ((c = getopt (argc, argv, "h:d:x:f:l:p:k:nryz")) != -1)
 	{
 		switch (c)
 		{
@@ -391,6 +400,9 @@ int main (int argc, char **argv)
 				break;
 			case 'k':
 				nice (atoi(optarg));
+				break;
+			case 'n':
+				no_dvb_poll = true;
 				break;
 			case 'r':
 				//log_disable ();
@@ -417,6 +429,7 @@ int main (int argc, char **argv)
 				printf ("  -p provider   opentv provider\n");
 				printf ("                default: %s\n", provider);
 				printf ("  -k nice       see \"man nice\"\n");
+				printf ("  -n            no dvb polling\"\n");
 				printf ("  -r            show progress\n");
 				printf ("  -y            debug mode for huffman dictionary (summaries)\n");
 				printf ("  -z            debug mode for huffman dictionary (titles)\n");
