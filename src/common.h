@@ -15,6 +15,7 @@ typedef enum type_bool {false = 0, true} bool;
 
 char provider[256];
 bool no_dvb_poll;
+bool carousel_dvb_poll;
 
 //#define MEMORYMON true
 

@@ -62,7 +62,7 @@ void dvb_read (dvb_t *settings, bool(*data_callback)(int, unsigned char*))
 		params.timeout = 5000;
 		params.flags = DMX_IMMEDIATE_START | DMX_CHECK_CRC;
 
-		if ((fd = open(settings->demuxer, O_RDWR | O_NONBLOCK)) < 0) {
+		if ((fd = open(settings->demuxer, O_RDONLY|O_CLOEXEC|O_NONBLOCK)) < 0) {
 			log_add ("Cannot open demuxer '%s'", settings->demuxer);
 			return;
 		}
@@ -130,7 +130,7 @@ void dvb_read (dvb_t *settings, bool(*data_callback)(int, unsigned char*))
 	}
 	else
 	{
-		struct pollfd PFD[256];
+		struct pollfd PFD[settings->pids_count];
 		int cycles, i, total_size;
 		struct dmx_sct_filter_params params;
 		dmx_source_t ssource;
@@ -141,9 +141,37 @@ void dvb_read (dvb_t *settings, bool(*data_callback)(int, unsigned char*))
 
 		ssource = DMX_SOURCE_FRONT0 + settings->frontend;
 
+		int dmx_next = 0;
+		char dmx_adpt[256];
+		memset(dmx_adpt, '\0', sizeof(dmx_adpt));
+
+		if (carousel_dvb_poll)
+		{
+			strcpy(dmx_adpt, settings->demuxer);
+			dmx_adpt[strlen(dmx_adpt)-1] = '\0';
+		}
+		else
+			log_add ("Polling..%s", settings->demuxer);
+
 		for (i = 0; i < settings->pids_count; i++)
 		{
-			PFD[i].fd = open (settings->demuxer, O_RDWR|O_NONBLOCK);
+			if (carousel_dvb_poll)
+			{
+				char dmx_dev[256];
+				memset(dmx_dev, '\0', 256);
+				sprintf(dmx_dev, "%s%i", dmx_adpt, dmx_next++);
+				if ((PFD[i].fd = open (dmx_dev, O_RDONLY|O_CLOEXEC|O_NONBLOCK)) < 0)
+				{
+					dmx_next = 0;
+					memset(dmx_dev, '\0', 256);
+					sprintf(dmx_dev, "%s%i", dmx_adpt, dmx_next++);
+					PFD[i].fd = open (dmx_dev, O_RDONLY|O_CLOEXEC|O_NONBLOCK);
+				}
+				log_add ("Polling 0x%d..%s", settings->pids[i], dmx_dev);
+			}
+			else
+				PFD[i].fd = open (settings->demuxer, O_RDONLY|O_CLOEXEC|O_NONBLOCK);
+
 			PFD[i].events = POLLIN;
 			PFD[i].revents = 0;
 

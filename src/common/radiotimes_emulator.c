@@ -379,7 +379,7 @@ int main (int argc, char **argv)
 	strcpy (demuxer, DEFAULT_DEMUXER);
 	strcpy (provider, DEFAULT_OTV_PROVIDER);
 
-	while ((c = getopt (argc, argv, "h:d:x:f:l:p:k:nryz")) != -1)
+	while ((c = getopt (argc, argv, "h:d:x:f:l:p:k:cnryz")) != -1)
 	{
 		switch (c)
 		{
@@ -400,6 +400,9 @@ int main (int argc, char **argv)
 				break;
 			case 'k':
 				nice (atoi(optarg));
+				break;
+			case 'c':
+				carousel_dvb_poll = true;
 				break;
 			case 'n':
 				no_dvb_poll = true;
@@ -429,6 +432,7 @@ int main (int argc, char **argv)
 				printf ("  -p provider   opentv provider\n");
 				printf ("                default: %s\n", provider);
 				printf ("  -k nice       see \"man nice\"\n");
+				printf ("  -c            carousel dvb polling\n");
 				printf ("  -n            no dvb polling\"\n");
 				printf ("  -r            show progress\n");
 				printf ("  -y            debug mode for huffman dictionary (summaries)\n");
