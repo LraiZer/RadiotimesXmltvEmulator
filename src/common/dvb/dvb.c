@@ -167,7 +167,7 @@ void dvb_read (dvb_t *settings, bool(*data_callback)(int, unsigned char*))
 					sprintf(dmx_dev, "%s%i", dmx_adpt, dmx_next++);
 					PFD[i].fd = open (dmx_dev, O_RDONLY|O_CLOEXEC|O_NONBLOCK);
 				}
-				log_add ("Polling 0x%d..%s", settings->pids[i], dmx_dev);
+				log_add ("Polling 0x%x..%s", settings->pids[i], dmx_dev);
 			}
 			else
 				PFD[i].fd = open (settings->demuxer, O_RDONLY|O_CLOEXEC|O_NONBLOCK);
