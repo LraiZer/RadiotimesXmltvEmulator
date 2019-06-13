@@ -21,7 +21,7 @@ void log_disable ()
 bool log_new (char *db_root)
 {
 	char log_filename[256];
-	sprintf (log_filename, "%s/radiotimes.log", db_root);
+	sprintf (log_filename, "%s/%s.log", db_root, provider);
 
 	fd = fopen (log_filename, "w");
 	if (fd != NULL)
@@ -33,7 +33,7 @@ bool log_new (char *db_root)
 bool log_open (char *db_root)
 {	
 	char log_filename[256];
-	sprintf (log_filename, "%s/radiotimes.log", db_root);
+	sprintf (log_filename, "%s/%s.log", db_root, provider);
 
 	fd = fopen (log_filename, "a");
 	

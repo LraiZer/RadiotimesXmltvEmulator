@@ -5,7 +5,6 @@ typedef enum type_bool {false = 0, true} bool;
 
 #define MAX_OTV_LOOP_CYCLES	90000
 #define MAX_BAT_LOOP_CYCLES	200
-#define DEFAULT_LOG_FILE	"/tmp/radiotimes.log"
 
 #define DEFAULT_OTV_PROVIDER	"skyuk_28.2"
 
