@@ -131,7 +131,7 @@ bool opentv_titles_callback (int size, unsigned char* data)
 	if (buffer_size_last + 100000 < buffer_size)
 	{
 		format_size (fsize, buffer_size);
-		if (iactive) log_add ("Reading.. %s", fsize);
+		if (iactive) log_add ("Reading titles.. %s", fsize);
 		buffer_size_last = buffer_size;
 	}
 	return !stop;
@@ -148,7 +148,7 @@ bool opentv_summaries_callback (int size, unsigned char* data)
 	if (buffer_size_last + 100000 < buffer_size)
 	{
 		format_size (fsize, buffer_size);
-		if (iactive) log_add ("Reading.. %s", fsize);
+		if (iactive) log_add ("Reading summaries.. %s", fsize);
 		buffer_size_last = buffer_size;
 	}
 	return !stop;
