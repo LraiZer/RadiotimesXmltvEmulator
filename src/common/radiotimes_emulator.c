@@ -266,7 +266,7 @@ void download_opentv ()
 						if (iactive)
 						{
 							log_add ("Parsing.. %s", size);
-							log_add ("Progress %%%d", (i*100)/buffer_index);
+							log_add ("Progress %d%%", (i*100)/buffer_index);
 						}
 						print_meminfo ();
 					}
@@ -313,7 +313,7 @@ void download_opentv ()
 						if (iactive)
 						{
 							log_add ("Parsing.. %s", size);
-							log_add ("Progress %%%d", (i*100)/buffer_index);
+							log_add ("Progress %d%%", (i*100)/buffer_index);
 						}
 						print_meminfo ();
 					}
