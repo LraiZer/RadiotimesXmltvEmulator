@@ -1090,7 +1090,7 @@ char *xmlify(const char *s, int len) {
 
 	switch ((unsigned char)*s) {
 		case 0x20 ... 0xFF: // if the first byte of the text field has a value in the range of "0x20" to "0xFF" then this and all subsequent bytes in the text item are coded using the default coding table (table 00 - Latin alphabet) of figure A.1
-			table = 0;
+			table = 5;
 			break;
 		case 0x01 ... 0x05: // if the first byte of the text field is in the range "0x01" to "0x05" then the remaining bytes in the text item are coded in accordance with character coding table 01 to 05 respectively, which are given in figures A.2 to A.6 respectively
 			table = *s++;
