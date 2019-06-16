@@ -14,6 +14,6 @@ int  providers_get_tsid ();
 int  providers_get_sid ();
 int  providers_get_orbital_position ();
 bool providers_read (char *read);
-char  *providers_get_channels_lang ();
+char  *providers_get_lang ();
 
 #endif // _OPENTV_PROVIDERS_H_

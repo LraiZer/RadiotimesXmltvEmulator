@@ -22,6 +22,7 @@ static int nid = 0;
 static int tsid = 0;
 static int sid = 0;
 static int orbital_position = 0;
+static char provider_lang[2] = {'e','n'};
 
 int  *providers_get_channels_pids() { return channels_pids;}
 int  *providers_get_titles_pids() { return titles_pids;}
@@ -35,6 +36,7 @@ int  providers_get_titles_pids_count() { return titles_pids_count;}
 int  providers_get_summaries_pids_count() { return summaries_pids_count;}
 int  providers_get_channels_types_count() { return channels_types_count;}
 int  providers_get_orbital_position() { return orbital_position; }
+char *providers_get_lang() { return provider_lang;}
 
 static char *providers_trim_spaces (char *text)
 {
@@ -92,6 +94,9 @@ bool providers_read (char *read)
 			sid = atoi (tmp_value);
 		else if (strcmp ("orbital_position", tmp_key) == 0)
 			orbital_position = atoi (tmp_value);
+		else if (strcmp ("lang", tmp_key) == 0)
+			strcpy(provider_lang, tmp_value);
+
 	}
 	
 	fclose (fd);

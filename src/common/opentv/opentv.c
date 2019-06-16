@@ -361,9 +361,9 @@ void opentv_read_summaries (unsigned char *data, unsigned int length, bool huffm
 					sprintf(name_file, "%s/%s.xml", db_root, provider);
 					outfile = fopen(name_file,"a");
 					fprintf(outfile, " <programme start=\"%s\" stop=\"%s\" channel=\"%i_%i_%i\">\n", mtime_s, mtime_e, providers_get_orbital_position(), channels[channel_id]->nid, channel_id);
-					fprintf(outfile, "  <title>%s</title>\n", xmlify(title->program, strlen(title->program)));
-					fprintf(outfile, "  <sub-title>%s</sub-title>\n", xmlify(genre[title->genre_id], strlen(genre[title->genre_id])));
-					fprintf(outfile, "  <desc>%s</desc>\n", xmlify(tmp, strlen(tmp)));
+					fprintf(outfile, "  <title lang=\"%s\">%s</title>\n", providers_get_lang(), xmlify(title->program, strlen(title->program)));
+					fprintf(outfile, "  <sub-title lang=\"%s\">%s</sub-title>\n", providers_get_lang(), xmlify(genre[title->genre_id], strlen(genre[title->genre_id])));
+					fprintf(outfile, "  <desc lang=\"%s\">%s</desc>\n", providers_get_lang(), xmlify(tmp, strlen(tmp)));
 					fprintf(outfile, " </programme>\n");
 					fflush(outfile);
 					fclose(outfile);
