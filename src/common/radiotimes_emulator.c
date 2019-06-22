@@ -72,10 +72,20 @@ int timeout = 0;
 
 bool iactive = false;
 
+bool sdt_callback (int size, unsigned char* data)
+{
+	if ((data[0] == 0x42) || (data[0] == 0x46))
+		opentv_read_channels_sdt (data, size);
+	else return !stop;
+
+	if (iactive) log_add ("1/6 - Reading.. %d services", opentv_channels_name_count ());
+	return !stop;
+}
+
 bool bat_callback (int size, unsigned char* data)
 {
 	if (data[0] == 0x4a) opentv_read_channels_bat (data, size, db_root);
-		if (iactive) log_add ("1/5 - Reading.. %d channels", opentv_channels_count ());
+		if (iactive) log_add ("2/6 - Reading.. %d channels", opentv_channels_count ());
 	return !stop;
 }
 
@@ -131,7 +141,7 @@ bool opentv_titles_callback (int size, unsigned char* data)
 	if (buffer_size_last + 100000 < buffer_size)
 	{
 		format_size (fsize, buffer_size);
-		if (iactive) log_add ("2/5 - Reading titles.. %s", fsize);
+		if (iactive) log_add ("3/6 - Reading titles.. %s", fsize);
 		buffer_size_last = buffer_size;
 	}
 	return !stop;
@@ -148,7 +158,7 @@ bool opentv_summaries_callback (int size, unsigned char* data)
 	if (buffer_size_last + 100000 < buffer_size)
 	{
 		format_size (fsize, buffer_size);
-		if (iactive) log_add ("4/5 - Reading summaries.. %s", fsize);
+		if (iactive) log_add ("5/6 - Reading summaries.. %s", fsize);
 		buffer_size_last = buffer_size;
 	}
 	return !stop;
@@ -175,15 +185,15 @@ void download_opentv ()
 		settings.demuxer = demuxer;
 		settings.frontend = frontend;
 		settings.buffer_size = 4 * 1024;
-
 		settings.min_length = 11;
-		settings.filter = 0x4a;
-		settings.mask = 0xff;
+		settings.filter = 0x40;
+		settings.mask = 0xf0;
 		settings.pid = 0x11;
 		settings.pids = providers_get_channels_pids();
 		settings.pids_count = providers_get_channels_pids_count();
 
-		log_add ("1/5 - Reading channels...");
+		log_add ("1/6 - Reading services...");
+		dvb_read (&settings, *sdt_callback);
 
 		FILE *outfile;
 		char name_file[256];
@@ -194,6 +204,13 @@ void download_opentv ()
 		fflush(outfile);
 		fclose(outfile);
 
+		print_meminfo ();
+		log_add ("1/6 - Read %d services", opentv_channels_name_count ());
+
+		settings.filter = 0x4a;
+		settings.mask = 0xff;
+
+		log_add ("2/6 - Reading channels...");
 		dvb_read (&settings, *bat_callback);
 
 		outfile = fopen(name_file,"a");
@@ -224,7 +241,7 @@ void download_opentv ()
 		fclose(outfile);
 
 		print_meminfo ();
-		log_add ("1/5 - Read %d channels", opentv_channels_count ());
+		log_add ("2/6 - Read %d channels", opentv_channels_count ());
 		if (stop) goto opentv_stop;
 
 		settings.min_length = 20;
@@ -242,14 +259,14 @@ void download_opentv ()
 			buffer_index = 0;
 			buffer_size = 0;
 			buffer_size_last = 0;
-			log_add ("2/5 - Reading titles...");
+			log_add ("3/6 - Reading titles...");
 			dvb_read (&settings, *opentv_titles_callback);
 			print_meminfo ();
 			format_size (size, buffer_size);
-			log_add ("2/5 - Read %s", size);
+			log_add ("3/6 - Read %s", size);
 			if (stop) goto opentv_stop;
 
-			log_add ("3/5 - Parsing titles...");
+			log_add ("4/6 - Parsing titles...");
 			buffer_size = 0;
 			time_t lasttime = 0;
 			for (i=0; i<buffer_index; i++)
@@ -263,14 +280,14 @@ void download_opentv ()
 					{
 						lasttime = time (NULL);
 						format_size (size, buffer_size);
-						if (iactive) log_add ("3/5 - Progress %d%% Parsing.. %s", (i*100)/buffer_index, size);
+						if (iactive) log_add ("4/6 - Progress %d%% Parsing.. %s", (i*100)/buffer_index, size);
 						print_meminfo ();
 					}
 				}
 			}
 			format_size (size, buffer_size);
 			print_meminfo ();
-			log_add ("3/5 - Titles parsed %s", size);
+			log_add ("4/6 - Titles parsed %s", size);
 
 			if (stop) goto opentv_stop;
 
@@ -283,15 +300,15 @@ void download_opentv ()
 			buffer_index = 0;
 			buffer_size = 0;
 			buffer_size_last = 0;
-			log_add ("4/5 - Reading summaries...");
+			log_add ("5/6 - Reading summaries...");
 			dvb_read (&settings, *opentv_summaries_callback);
 			print_meminfo ();
 			format_size (size, buffer_size);
 			print_meminfo ();
-			log_add ("4/5 - Read %s", size);
+			log_add ("5/6 - Read %s", size);
 			if (stop) goto opentv_stop;
 
-			log_add ("5/5 - Parsing summaries...");
+			log_add ("6/6 - Parsing summaries...");
 			buffer_size = 0;
 			lasttime = 0;
 			for (i=0; i<buffer_index; i++)
@@ -305,14 +322,14 @@ void download_opentv ()
 					{
 						lasttime = time (NULL);
 						format_size (size, buffer_size);
-						if (iactive) log_add ("5/5 - Progress %d%% Parsing.. %s", (i*100)/buffer_index, size);
+						if (iactive) log_add ("6/6 - Progress %d%% Parsing.. %s", (i*100)/buffer_index, size);
 						print_meminfo ();
 					}
 				}
 			}
 			format_size (size, buffer_size);
 			print_meminfo ();
-			log_add ("5/5 - Summaries parsed %s", size);
+			log_add ("6/6 - Summaries parsed %s", size);
 
 			if (!no_dvb_poll) break;
 		}

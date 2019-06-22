@@ -22,8 +22,9 @@
 #define MAX_CHANNELS		0xFFFF
 
 static epgdb_channel_t *channels[MAX_CHANNELS];
+char channels_name[MAX_CHANNELS][256];
 
-static unsigned short int ch_count;
+static unsigned short int ch_count, ch_name_count;
 static int tit_count;
 
 void removeSubstring(char *s,const char *toremove)
@@ -55,8 +56,7 @@ char *replace_Substring(char *str, char *orig, char *rep, int start)
 void opentv_init ()
 {
 	int i;
-	ch_count = 0;
-	tit_count = 0;
+	ch_count = ch_name_count = tit_count = 0;
 	for (i=0; i<MAX_CHANNELS; i++)
 		channels[i] = NULL;
 	for (i=0; i<MAX_GENRE_SIZE; i++)
@@ -71,6 +71,60 @@ void opentv_cleanup ()
 		if (genre[i] != NULL)
 		{
 			_free (genre[i]);
+		}
+	}
+}
+
+void opentv_read_channels_sdt (unsigned char *data, unsigned int length)
+{
+	int offset = 11;
+	length -= 11;
+
+	while (length >= 5)
+	{
+		unsigned short service_id = (data[offset] << 8) | data[offset + 1];
+		//unsigned short free_ca = (data[offset + 3] >> 4) & 0x01;
+		int descriptors_loop_length = ((data[offset + 3] & 0x0f) << 8) | data[offset + 4];
+		char service_name[256];
+
+		memset(service_name, '\0', 256);
+
+		length -= 5;
+		offset += 5;
+
+		int offset2 = offset;
+
+		length -= descriptors_loop_length;
+		offset += descriptors_loop_length;
+
+		while (descriptors_loop_length >= 2)
+		{
+			unsigned char descriptor_tag = data[offset2];
+			unsigned char descriptor_length = data[offset2 + 1];
+
+			if (descriptor_tag == 0x48)
+			{
+				int service_provider_name_length = data[offset2 + 3];
+				if (service_provider_name_length == 255)
+					service_provider_name_length--;
+
+				int service_name_length = data[offset2 + 4 + service_provider_name_length];
+				if (service_name_length == 255)
+					service_name_length--;
+
+				memcpy(service_name, data + offset2 + 5 + service_provider_name_length, service_name_length);
+			}
+			if (descriptor_tag == 0xc0)
+				memcpy(service_name, data + offset2 + 2, descriptor_length);
+
+			descriptors_loop_length -= (descriptor_length + 2);
+			offset2 += (descriptor_length + 2);
+		}
+
+		if (channels_name[service_id][0] == '\0')
+		{
+			ch_name_count++;
+			memcpy(channels_name[service_id], service_name, sizeof(service_name));
 		}
 	}
 }
@@ -106,7 +160,7 @@ bool opentv_read_channels_bat (unsigned char *data, unsigned int length, char *d
 			
 			offset2 += (descriptor_length + 2);
 			transport_descriptor_length -= (descriptor_length + 2);
-			
+
 			if (descriptor_tag == 0xb1)
 			{
 				offset3 += 2;
@@ -130,7 +184,7 @@ bool opentv_read_channels_bat (unsigned char *data, unsigned int length, char *d
 						memset(name_file, '\0', 256);
 						sprintf(name_file, "%s/%s.channels.xml", db_root, provider);
 						outfile = fopen(name_file,"a");
-						fprintf(outfile,"<!-- %s --><channel id=\"%i_%i_%i\">1:0:%x:%x:%x:%x:%x:0:0:0:</channel><!-- \"%i\" -->\n",
+						fprintf(outfile,"<!-- %s --><channel id=\"%i_%i_%i\">1:0:%02X:%04X:%04X:%X:%08X:0:0:0:</channel><!-- \"%s\" -->\n",
 							provider,
 							providers_get_orbital_position(), nid, channel_id,
 							type_id,
@@ -138,7 +192,7 @@ bool opentv_read_channels_bat (unsigned char *data, unsigned int length, char *d
 							tid,
 							nid,
 							name_space,
-							channel_id);
+							channels_name[sid]);
 						fflush(outfile);
 						fclose(outfile);
 
@@ -161,6 +215,11 @@ unsigned short opentv_channels_count()
 	return ch_count;
 }
 
+unsigned short opentv_channels_name_count()
+{
+	return ch_name_count;
+}
+
 void opentv_read_titles (unsigned char *data, unsigned int length, bool huffman_debug)
 {
 	epgdb_title_t *title;
@@ -177,7 +236,7 @@ void opentv_read_titles (unsigned char *data, unsigned int length, bool huffman_
 			unsigned char description_length;
 			unsigned short int packet_length = ((data[offset + 2] & 0x0f) << 8) | data[offset + 3];
 			
-			if ((data[offset + 4] != 0xb5) || ((packet_length + offset) > length)) break;// || channel_id != 4191
+			if ((data[offset + 4] != 0xb5) || ((packet_length + offset) > length)) break;
 			
 			event_id = (data[offset] << 8) | data[offset + 1];
 			offset += 4;
@@ -287,40 +346,6 @@ void opentv_read_summaries (unsigned char *data, unsigned int length, bool huffm
 						printf ("Start time: %s\n", mtime);
 						
 					}
-/*
-	RadioTimes XMLTV feed Structure
-	###############################
-	# 01 Programme Title
-	# 02 Sub-Title
-	# 03 Episode
-	# 04 Year
-	# 05 Director
-	# 06 Performers (Cast) - This will be either a string containing the Actors names or be made up of 
-	#    Character name and Actor name pairs which are separated by an asterix "*" and each pair by pipe "|" 
-	#    e.g. Rocky*Sylvester Stallone|Terminator*Arnold Schwarzenegger. 
-	# 07 Premiere
-	# 08 Film
-	# 09 Repear
-	# 10 Subtitles
-	# 11 Widescreen
-	# 12 New series
-	# 13 Deaf signed
-	# 14 Black and White
-	# 15 Film star rating
-	# 16 Film certificate
-	# 17 Genre
-	# 18 Description
-	# 19 Radio Times Choice - This means that the Radio Times editorial team have marked it as a choice
-	# 20 Date
-	# 21 Start Time
-	# 22 End Time
-	# 23 Duration (Minutes)
-
-	Close~~~~~~false~false~false~false~false~false~false~false~~~No Genre~~false~19/05/2011~02:30~10:00~450
-	The Bounty Hunter~~~2010~Andy Tennant~Milo Boyd*Gerard Butler|Nicole Hurley*Jennifer Aniston~false~true~false~true~true~false~false~false~2~12~Film~Cop-turned-bounty hunter is assigned to track down his bail-jumping reporter ex-wife. They are in turn pursued by crooked detectives who fear the feisty Nicole is getting too close to the truth.~false~19/05/2011~10:00~12:00~120
-	Family Show~~~~~~false~false~false~false~true~false~false~false~~~Entertainment~The latest films from the UK and the US.~false~19/05/2011~12:00~12:30~30
-*/
-
 /*
 					// Keep current timestamp, we write the localtime() +0000/+0100 offset %z
 					// OR convert to GMT, should set timestamp and localtime offset to +0000?
