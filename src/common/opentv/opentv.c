@@ -184,7 +184,7 @@ bool opentv_read_channels_bat (unsigned char *data, unsigned int length, char *d
 						memset(name_file, '\0', 256);
 						sprintf(name_file, "%s/%s.channels.xml", db_root, provider);
 						outfile = fopen(name_file,"a");
-						fprintf(outfile,"<!-- %s --><channel id=\"%i_%i_%i\">1:0:%02X:%04X:%04X:%X:%08X:0:0:0:</channel><!-- \"%s\" -->\n",
+						fprintf(outfile,"<!-- %s --><channel id=\"%i_%i_%i\">1:0:%X:%X:%X:%X:%X:0:0:0:</channel><!-- \"%s\" -->\n",
 							provider,
 							providers_get_orbital_position(), nid, channel_id,
 							type_id,
