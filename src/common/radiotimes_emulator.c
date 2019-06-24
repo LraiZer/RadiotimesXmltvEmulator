@@ -235,7 +235,7 @@ void download_opentv ()
 		fprintf(outfile," generator-info-url=\"https://github.com/LraiZer/RadiotimesXmltvEmulator{BRANCH}\"\n --> \n");
 		fprintf(outfile,"\t<mappings>\n\t\t<channel name=\"%s.channels.xml\">\n\t\t\t<url>%s/%s.channels.xml</url>\n", provider, db_root, provider);
 		fprintf(outfile,"\t\t</channel>\n\t</mappings>\n\t<sourcecat sourcecatname=\"RadioTimes Emulator %s XMLTV\">\n", provider);
-		fprintf(outfile,"\t\t<source type=\"gen_xmltv\" channels=\"%s.channels.xml\">\n\t\t\t<description>OpenTv (%s.xml)</description>\n", provider, provider);
+		fprintf(outfile,"\t\t<source type=\"gen_xmltv\" channels=\"%s.channels.xml\">\n\t\t\t<description>OpenTV (%s.xml)</description>\n", provider, provider);
 		fprintf(outfile,"\t\t\t<url>%s/%s.xml</url>\n\t\t</source>\n\t</sourcecat>\n</sources>\n", db_root, provider);
 		fflush(outfile);
 		fclose(outfile);
