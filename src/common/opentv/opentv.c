@@ -112,6 +112,15 @@ void opentv_read_channels_sdt (unsigned char *data, unsigned int length)
 				if (service_name_length == 255)
 					service_name_length--;
 
+				if (service_name_length > 0)
+				{
+					if (data[offset2 + 5 + service_provider_name_length] == 0x05)
+					{
+						service_provider_name_length++;
+						service_name_length--;
+					}
+				}
+
 				memcpy(service_name, data + offset2 + 5 + service_provider_name_length, service_name_length);
 			}
 			if (descriptor_tag == 0xc0)
