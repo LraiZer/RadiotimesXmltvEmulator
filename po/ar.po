@@ -1,0 +1,170 @@
+# Arabic translations for PACKAGE package.
+# Copyright (C) 2019 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Automatically generated, 2019.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-06-22 19:29+0200\n"
+"PO-Revision-Date: 2019-06-22 19:29+0200\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "%a %e %b  %-H:%M"
+msgstr ""
+
+msgid "About"
+msgstr ""
+
+msgid "Cannot allocate the demuxer."
+msgstr ""
+
+msgid "Cannot free NIM because a recording is in progress"
+msgstr ""
+
+msgid "Cannot get frontend"
+msgstr ""
+
+msgid "Cannot get the NIM"
+msgstr ""
+
+msgid "Cannot retrieve Resource Manager instance"
+msgstr ""
+
+msgid "Carousel dvb polling"
+msgstr ""
+
+msgid "Creates XML files from OpenTV for use by EPG-Import plugin"
+msgstr ""
+
+msgid "Daily"
+msgstr ""
+
+msgid "Database location"
+msgstr ""
+
+msgid "Download"
+msgstr ""
+
+msgid "Download successfully completed!"
+msgstr ""
+
+msgid "Enough Retries, delaying till next schedule."
+msgstr ""
+
+msgid "Every 3 days"
+msgstr ""
+
+msgid "Exit"
+msgstr ""
+
+msgid "No compatible tuner found"
+msgstr ""
+
+msgid "No dvb polling"
+msgstr ""
+
+msgid ""
+"No providers to search. Please select at least one provider in the setup "
+"menu."
+msgstr ""
+
+#, python-format
+msgid "No valid NIM found for %s"
+msgstr ""
+
+msgid ""
+"Only select this option if you fully understand why you need it, otherwise "
+"leave it \"off\"."
+msgstr ""
+
+#, python-format
+msgid "Radio Times Emulator - Downloading %s"
+msgstr ""
+
+msgid "Radio Times Emulator Download"
+msgstr ""
+
+msgid "Radio Times Emulator Downloader"
+msgstr ""
+
+msgid "Radio Times Emulator GUI"
+msgstr ""
+
+msgid "Radio Times Emulator GUI - Setup"
+msgstr ""
+
+msgid ""
+"Radio Times Emulator update is about to start.\n"
+"Do you want to allow this?"
+msgstr ""
+
+#, python-format
+msgid "Reading EPG from %s MHz"
+msgstr ""
+
+msgid "Really close without saving settings?"
+msgstr ""
+
+msgid "Save"
+msgstr ""
+
+msgid "Schedule repeat interval"
+msgstr ""
+
+msgid "Schedule time of day"
+msgstr ""
+
+msgid "Scheduled scan"
+msgstr ""
+
+msgid ""
+"Select the path where you want to save the files created by Radio Times "
+"Xmltv Emulator. The files will be read from this location. Locating the "
+"database in \"/tmp/\" means it will be lost on reboots."
+msgstr ""
+
+msgid "Set how often the scan should be done."
+msgstr ""
+
+msgid "Set the time of day to perform the EPG scan."
+msgstr ""
+
+msgid "Set up a task scheduler to automatically download the EPG data."
+msgstr ""
+
+msgid "Starting download..."
+msgstr ""
+
+msgid "Starting downloader"
+msgstr ""
+
+msgid ""
+"The current configuration has been saved. After downloading the first time "
+"the selected providers will need to be enabled in EPG-Importer plugin."
+msgstr ""
+
+msgid ""
+"This option enables fetching EPG data for the currently selected provider."
+msgstr ""
+
+#, python-format
+msgid "Tune failure. Provider %s. %s MHz. Tuner %s"
+msgstr ""
+
+#, python-format
+msgid "Tuner lock timeout. Provider %s. %s MHz. Tuner %s"
+msgstr ""
+
+#, python-format
+msgid "Tuning %s, %s MHz"
+msgstr ""
+
+msgid "Weekly"
+msgstr ""

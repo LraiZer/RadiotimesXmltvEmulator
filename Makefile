@@ -37,6 +37,16 @@ $(DOWNLOADER_BIN): $(OBJS) $(DOWNLOADER_OBJS)
 clean:
 	rm -f $(OBJS) $(DOWNLOADER_OBJS) $(DOWNLOADER_BIN)
 
+install-gui:
+	install -d $(D)${libdir}/enigma2/python/Plugins/SystemPlugins/RadioTimesEmulatorGUI/images
+	install -m 644 images/*.png $(D)${libdir}/enigma2/python/Plugins/SystemPlugins/RadioTimesEmulatorGUI/images/
+	install -m 644 enigma2/python/*.py $(D)${libdir}/enigma2/python/Plugins/SystemPlugins/RadioTimesEmulatorGUI/
+	install -m 644 enigma2/python/*.pyo $(D)${libdir}/enigma2/python/Plugins/SystemPlugins/RadioTimesEmulatorGUI/
+	install -m 644 enigma2/python/LICENSE $(D)${libdir}/enigma2/python/Plugins/SystemPlugins/RadioTimesEmulatorGUI/
+	install -m 644 enigma2/python/LICENSE.GPLv2 $(D)${libdir}/enigma2/python/Plugins/SystemPlugins/RadioTimesEmulatorGUI/
+	install -m 644 enigma2/python/README.txt $(D)${libdir}/enigma2/python/Plugins/SystemPlugins/RadioTimesEmulatorGUI/
+	
+
 install-standalone:
 	install -d $(D)/usr/radiotimes_emulator/providers
 	install -m 755 bin/radiotimes_emulator $(D)/usr/radiotimes_emulator/
@@ -50,4 +60,5 @@ install-standalone-var:
 install: install-standalone
 install-var: install-standalone-var
 install-var-flash: install-standalone-var
+install-plugin: install-standalone install-gui
 

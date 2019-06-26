@@ -1,0 +1,183 @@
+# English translations for PACKAGE package.
+# Copyright (C) 2019 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Automatically generated, 2019.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-06-22 19:29+0200\n"
+"PO-Revision-Date: 2019-06-22 19:29+0200\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: en_GB\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "%a %e %b  %-H:%M"
+msgstr "%a %e %b  %-H:%M"
+
+msgid "About"
+msgstr "About"
+
+msgid "Cannot allocate the demuxer."
+msgstr "Cannot allocate the demuxer."
+
+msgid "Cannot free NIM because a recording is in progress"
+msgstr "Cannot free NIM because a recording is in progress"
+
+msgid "Cannot get frontend"
+msgstr "Cannot get frontend"
+
+msgid "Cannot get the NIM"
+msgstr "Cannot get the NIM"
+
+msgid "Cannot retrieve Resource Manager instance"
+msgstr "Cannot retrieve Resource Manager instance"
+
+msgid "Carousel dvb polling"
+msgstr "Carousel dvb polling"
+
+msgid "Creates XML files from OpenTV for use by EPG-Import plugin"
+msgstr "Creates XML files from OpenTV for use by EPG-Import plugin"
+
+msgid "Daily"
+msgstr "Daily"
+
+msgid "Database location"
+msgstr "Database location"
+
+msgid "Download"
+msgstr "Download"
+
+msgid "Download successfully completed!"
+msgstr "Download successfully completed!"
+
+msgid "Enough Retries, delaying till next schedule."
+msgstr "Enough Retries, delaying till next schedule."
+
+msgid "Every 3 days"
+msgstr "Every 3 days"
+
+msgid "Exit"
+msgstr "Exit"
+
+msgid "No compatible tuner found"
+msgstr "No compatible tuner found"
+
+msgid "No dvb polling"
+msgstr "No dvb polling"
+
+msgid ""
+"No providers to search. Please select at least one provider in the setup "
+"menu."
+msgstr ""
+"No providers to search. Please select at least one provider in the setup "
+"menu."
+
+#, python-format
+msgid "No valid NIM found for %s"
+msgstr "No valid NIM found for %s"
+
+msgid ""
+"Only select this option if you fully understand why you need it, otherwise "
+"leave it \"off\"."
+msgstr ""
+"Only select this option if you fully understand why you need it, otherwise "
+"leave it \"off\"."
+
+#, python-format
+msgid "Radio Times Emulator - Downloading %s"
+msgstr "Radio Times Emulator - Downloading %s"
+
+msgid "Radio Times Emulator Download"
+msgstr "Radio Times Emulator Download"
+
+msgid "Radio Times Emulator Downloader"
+msgstr "Radio Times Emulator Downloader"
+
+msgid "Radio Times Emulator GUI"
+msgstr "Radio Times Emulator GUI"
+
+msgid "Radio Times Emulator GUI - Setup"
+msgstr "Radio Times Emulator GUI - Setup"
+
+msgid ""
+"Radio Times Emulator update is about to start.\n"
+"Do you want to allow this?"
+msgstr ""
+"Radio Times Emulator update is about to start.\n"
+"Do you want to allow this?"
+
+#, python-format
+msgid "Reading EPG from %s MHz"
+msgstr "Reading EPG from %s MHz"
+
+msgid "Really close without saving settings?"
+msgstr "Really close without saving settings?"
+
+msgid "Save"
+msgstr "Save"
+
+msgid "Schedule repeat interval"
+msgstr "Schedule repeat interval"
+
+msgid "Schedule time of day"
+msgstr "Schedule time of day"
+
+msgid "Scheduled scan"
+msgstr "Scheduled scan"
+
+msgid ""
+"Select the path where you want to save the files created by Radio Times "
+"Xmltv Emulator. The files will be read from this location. Locating the "
+"database in \"/tmp/\" means it will be lost on reboots."
+msgstr ""
+"Select the path where you want to save the files created by Radio Times "
+"Xmltv Emulator. The files will be read from this location. Locating the "
+"database in \"/tmp/\" means it will be lost on reboots."
+
+msgid "Set how often the scan should be done."
+msgstr "Set how often the scan should be done."
+
+msgid "Set the time of day to perform the EPG scan."
+msgstr "Set the time of day to perform the EPG scan."
+
+msgid "Set up a task scheduler to automatically download the EPG data."
+msgstr "Set up a task scheduler to automatically download the EPG data."
+
+msgid "Starting download..."
+msgstr "Starting download..."
+
+msgid "Starting downloader"
+msgstr "Starting downloader"
+
+msgid ""
+"The current configuration has been saved. After downloading the first time "
+"the selected providers will need to be enabled in EPG-Importer plugin."
+msgstr ""
+"The current configuration has been saved. After downloading the first time "
+"the selected providers will need to be enabled in EPG-Importer plugin."
+
+msgid ""
+"This option enables fetching EPG data for the currently selected provider."
+msgstr ""
+"This option enables fetching EPG data for the currently selected provider."
+
+#, python-format
+msgid "Tune failure. Provider %s. %s MHz. Tuner %s"
+msgstr "Tune failure. Provider %s. %s MHz. Tuner %s"
+
+#, python-format
+msgid "Tuner lock timeout. Provider %s. %s MHz. Tuner %s"
+msgstr "Tuner lock timeout. Provider %s. %s MHz. Tuner %s"
+
+#, python-format
+msgid "Tuning %s, %s MHz"
+msgstr "Tuning %s, %s MHz"
+
+msgid "Weekly"
+msgstr "Weekly"
