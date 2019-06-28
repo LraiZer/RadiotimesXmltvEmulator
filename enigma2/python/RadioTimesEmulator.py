@@ -431,152 +431,155 @@ class RadioTimesEmulatorDisplayOutput(Console):
 
 # scheduler
 
-autoRadioTimesEmulatorTimer = None
-def RadioTimesEmulatorautostart(reason, session=None, **kwargs):
+autoScheduleTimer = None
+def Scheduleautostart(reason, session=None, **kwargs):
 	"called with reason=1 to during /sbin/shutdown.sysvinit, with reason=0 at startup?"
-	global autoRadioTimesEmulatorTimer
+	global autoScheduleTimer
 	global _session
 	now = int(time())
 	if reason == 0:
-		print "[RadioTimesEmulator][RadioTimesEmulatorautostart] AutoStart Enabled"
+		print "[RadioTimesEmulator][Scheduleautostart] AutoStart Enabled"
 		if session is not None:
 			_session = session
-			if autoRadioTimesEmulatorTimer is None:
-				autoRadioTimesEmulatorTimer = AutoRadioTimesEmulatorTimer(session)
+			if autoScheduleTimer is None:
+				autoScheduleTimer = AutoScheduleTimer(session)
 	else:
-		print "[RadioTimesEmulator][RadioTimesEmulatorautostart] Stop"
-		autoRadioTimesEmulatorTimer.stop()
+		print "[RadioTimesEmulator][Scheduleautostart] Stop"
+		autoScheduleTimer.stop()
 
-class AutoRadioTimesEmulatorTimer:
+class AutoScheduleTimer:
 	instance = None
 	def __init__(self, session):
+		self.schedulename = "RadioTimesEmulator"
+		self.config = config.plugins.RadioTimesEmulator
+		self.itemtorun = RadioTimesEmulator
 		self.session = session
-		self.radiotimesemulatortimer = eTimer()
-		self.radiotimesemulatortimer.callback.append(self.RadioTimesEmulatoronTimer)
-		self.radiotimesemulatoractivityTimer = eTimer()
-		self.radiotimesemulatoractivityTimer.timeout.get().append(self.radiotimesemulatordatedelay)
+		self.scheduletimer = eTimer()
+		self.scheduletimer.callback.append(self.ScheduleonTimer)
+		self.scheduleactivityTimer = eTimer()
+		self.scheduleactivityTimer.timeout.get().append(self.scheduledatedelay)
 		now = int(time())
-		global RadioTimesEmulatorTime
-		if config.plugins.RadioTimesEmulator.schedule.value:
-			print "[RadioTimesEmulator][AutoRadioTimesEmulatorTimer] Schedule Enabled at ", strftime("%c", localtime(now))
+		global ScheduleTime
+		if self.config.schedule.value:
+			print "[%s][AutoScheduleTimer] Schedule Enabled at " % self.schedulename, strftime("%c", localtime(now))
 			if now > 1262304000:
-				self.radiotimesemulatordate()
+				self.scheduledate()
 			else:
-				print "[RadioTimesEmulator][AutoRadioTimesEmulatorTimer] Time not yet set."
-				RadioTimesEmulatorTime = 0
-				self.radiotimesemulatoractivityTimer.start(36000)
+				print "[%s][AutoScheduleTimer] Time not yet set." % self.schedulename
+				ScheduleTime = 0
+				self.scheduleactivityTimer.start(36000)
 		else:
-			RadioTimesEmulatorTime = 0
-			print "[RadioTimesEmulator][AutoRadioTimesEmulatorTimer] Schedule Disabled at", strftime("%c", localtime(now))
-			self.radiotimesemulatoractivityTimer.stop()
+			ScheduleTime = 0
+			print "[%s][AutoScheduleTimer] Schedule Disabled at" % self.schedulename, strftime("%c", localtime(now))
+			self.scheduleactivityTimer.stop()
 
-		assert AutoRadioTimesEmulatorTimer.instance is None, "class AutoRadioTimesEmulatorTimer is a singleton class and just one instance of this class is allowed!"
-		AutoRadioTimesEmulatorTimer.instance = self
+		assert AutoScheduleTimer.instance is None, "class AutoScheduleTimer is a singleton class and just one instance of this class is allowed!"
+		AutoScheduleTimer.instance = self
 
 	def __onClose(self):
-		AutoRadioTimesEmulatorTimer.instance = None
+		AutoScheduleTimer.instance = None
 
-	def radiotimesemulatordatedelay(self):
-		self.radiotimesemulatoractivityTimer.stop()
-		self.radiotimesemulatordate()
+	def scheduledatedelay(self):
+		self.scheduleactivityTimer.stop()
+		self.scheduledate()
 
-	def getRadioTimesEmulatorTime(self):
-		backupclock = config.plugins.RadioTimesEmulator.scheduletime.value
+	def getScheduleTime(self):
+		backupclock = self.config.scheduletime.value
 		nowt = time()
 		now = localtime(nowt)
 		return int(mktime((now.tm_year, now.tm_mon, now.tm_mday, backupclock[0], backupclock[1], 0, now.tm_wday, now.tm_yday, now.tm_isdst)))
 
-	def radiotimesemulatordate(self, atLeast = 0):
-		self.radiotimesemulatortimer.stop()
-		global RadioTimesEmulatorTime
-		RadioTimesEmulatorTime = self.getRadioTimesEmulatorTime()
+	def scheduledate(self, atLeast = 0):
+		self.scheduletimer.stop()
+		global ScheduleTime
+		ScheduleTime = self.getScheduleTime()
 		now = int(time())
-		if RadioTimesEmulatorTime > 0:
-			if RadioTimesEmulatorTime < now + atLeast:
-				if config.plugins.RadioTimesEmulator.repeattype.value == "daily":
-					RadioTimesEmulatorTime += 24*3600
-					while (int(RadioTimesEmulatorTime)-30) < now:
-						RadioTimesEmulatorTime += 24*3600
-				elif config.plugins.RadioTimesEmulator.repeattype.value == "every 3 days":
-					RadioTimesEmulatorTime += 3*24*3600
-					while (int(RadioTimesEmulatorTime)-30) < now:
-						RadioTimesEmulatorTime += 3*24*3600
-				elif config.plugins.RadioTimesEmulator.repeattype.value == "weekly":
-					RadioTimesEmulatorTime += 7*24*3600
-					while (int(RadioTimesEmulatorTime)-30) < now:
-						RadioTimesEmulatorTime += 7*24*3600
-#				elif config.plugins.RadioTimesEmulator.repeattype.value == "monthly":
-#					RadioTimesEmulatorTime += 30*24*3600
-#					while (int(RadioTimesEmulatorTime)-30) < now:
-#						RadioTimesEmulatorTime += 30*24*3600
-			next = RadioTimesEmulatorTime - now
-			self.radiotimesemulatortimer.startLongTimer(next)
+		if ScheduleTime > 0:
+			if ScheduleTime < now + atLeast:
+				if self.config.repeattype.value == "daily":
+					ScheduleTime += 24*3600
+					while (int(ScheduleTime)-30) < now:
+						ScheduleTime += 24*3600
+				elif self.config.repeattype.value == "every 3 days":
+					ScheduleTime += 3*24*3600
+					while (int(ScheduleTime)-30) < now:
+						ScheduleTime += 3*24*3600
+				elif self.config.repeattype.value == "weekly":
+					ScheduleTime += 7*24*3600
+					while (int(ScheduleTime)-30) < now:
+						ScheduleTime += 7*24*3600
+#				elif self.config.repeattype.value == "monthly":
+#					ScheduleTime += 30*24*3600
+#					while (int(ScheduleTime)-30) < now:
+#						ScheduleTime += 30*24*3600
+			next = ScheduleTime - now
+			self.scheduletimer.startLongTimer(next)
 		else:
-			RadioTimesEmulatorTime = -1
-		print "[RadioTimesEmulator][radiotimesemulatordate] Time set to", strftime("%c", localtime(RadioTimesEmulatorTime)), strftime("(now=%c)", localtime(now))
-		return RadioTimesEmulatorTime
+			ScheduleTime = -1
+		print "[%s][scheduledate] Time set to" % self.schedulename, strftime("%c", localtime(ScheduleTime)), strftime("(now=%c)", localtime(now))
+		return ScheduleTime
 
 	def backupstop(self):
-		self.radiotimesemulatortimer.stop()
+		self.scheduletimer.stop()
 
-	def RadioTimesEmulatoronTimer(self):
-		self.radiotimesemulatortimer.stop()
+	def ScheduleonTimer(self):
+		self.scheduletimer.stop()
 		now = int(time())
-		wake = self.getRadioTimesEmulatorTime()
+		wake = self.getScheduleTime()
 		# If we're close enough, we're okay...
 		atLeast = 0
 		if wake - now < 60:
 			atLeast = 60
-			print "[RadioTimesEmulator][RadioTimesEmulatoronTimer] onTimer occured at", strftime("%c", localtime(now))
+			print "[%s][ScheduleonTimer] onTimer occured at" % self.schedulename, strftime("%c", localtime(now))
 			from Screens.Standby import inStandby
 			if not inStandby:
-				message = _("Radio Times Emulator update is about to start.\nDo you want to allow this?")
-				ybox = self.session.openWithCallback(self.doRadioTimesEmulator, MessageBox, message, MessageBox.TYPE_YESNO, timeout = 30)
-				ybox.setTitle('Radio Times Emulator scheduled update')
+				message = _("%s update is about to start.\nDo you want to allow this?") % self.schedulename
+				ybox = self.session.openWithCallback(self.doSchedule, MessageBox, message, MessageBox.TYPE_YESNO, timeout = 30)
+				ybox.setTitle(_('%s scheduled update') % self.schedulename)
 			else:
-				self.doRadioTimesEmulator(True)
-		self.radiotimesemulatordate(atLeast)
+				self.doSchedule(True)
+		self.scheduledate(atLeast)
 
-	def doRadioTimesEmulator(self, answer):
+	def doSchedule(self, answer):
 		now = int(time())
 		if answer is False:
-			if config.plugins.RadioTimesEmulator.retrycount.value < 2:
-				print "[RadioTimesEmulator][doRadioTimesEmulator] RadioTimesEmulator delayed."
-				repeat = config.plugins.RadioTimesEmulator.retrycount.value
+			if self.config.retrycount.value < 2:
+				print "[%s][doSchedule] Schedule delayed." % self.schedulename
+				repeat = self.config.retrycount.value
 				repeat += 1
-				config.plugins.RadioTimesEmulator.retrycount.value = repeat
-				RadioTimesEmulatorTime = now + (int(config.plugins.RadioTimesEmulator.retry.value) * 60)
-				print "[RadioTimesEmulator][doRadioTimesEmulator] Time now set to", strftime("%c", localtime(RadioTimesEmulatorTime)), strftime("(now=%c)", localtime(now))
-				self.radiotimesemulatortimer.startLongTimer(int(config.plugins.RadioTimesEmulator.retry.value) * 60)
+				self.config.retrycount.value = repeat
+				ScheduleTime = now + (int(self.config.retry.value) * 60)
+				print "[%s][doSchedule] Time now set to" % self.schedulename, strftime("%c", localtime(ScheduleTime)), strftime("(now=%c)", localtime(now))
+				self.scheduletimer.startLongTimer(int(self.config.retry.value) * 60)
 			else:
 				atLeast = 60
-				print "[RadioTimesEmulator][doRadioTimesEmulator] Enough Retries, delaying till next schedule.", strftime("%c", localtime(now))
+				print "[%s][doSchedule] Enough Retries, delaying till next schedule." % self.schedulename, strftime("%c", localtime(now))
 				self.session.open(MessageBox, _("Enough Retries, delaying till next schedule."), MessageBox.TYPE_INFO, timeout = 10)
-				config.plugins.RadioTimesEmulator.retrycount.value = 0
-				self.radiotimesemulatordate(atLeast)
+				self.config.retrycount.value = 0
+				self.scheduledate(atLeast)
 		else:
 			self.timer = eTimer()
 			self.timer.callback.append(self.doautostartscan)
-			print "[RadioTimesEmulator][doRadioTimesEmulator] Running RadioTimesEmulator", strftime("%c", localtime(now))
+			print "[%s][doSchedule] Running Schedule" % self.schedulename, strftime("%c", localtime(now))
 			self.timer.start(100, 1)
 
 	def doautostartscan(self):
-		self.session.open(RadioTimesEmulator)
+		self.session.open(self.itemtorun)
 
 	def doneConfiguring(self): # called from plugin on save
 		now = int(time())
-		if config.plugins.RadioTimesEmulator.schedule.value:
-			if autoRadioTimesEmulatorTimer is not None:
-				print "[RadioTimesEmulator][doneConfiguring] Schedule Enabled at", strftime("%c", localtime(now))
-				autoRadioTimesEmulatorTimer.radiotimesemulatordate()
+		if self.config.schedule.value:
+			if autoScheduleTimer is not None:
+				print "[%s][doneConfiguring] Schedule Enabled at" % self.schedulename, strftime("%c", localtime(now))
+				autoScheduleTimer.scheduledate()
 		else:
-			if autoRadioTimesEmulatorTimer is not None:
-				global RadioTimesEmulatorTime
-				RadioTimesEmulatorTime = 0
-				print "[RadioTimesEmulator][doneConfiguring] Schedule Disabled at", strftime("%c", localtime(now))
-				autoRadioTimesEmulatorTimer.backupstop()
-		if RadioTimesEmulatorTime > 0:
-			t = localtime(RadioTimesEmulatorTime)
-			radiotimesemulatortext = strftime(_("%a %e %b  %-H:%M"), t)
+			if autoScheduleTimer is not None:
+				global ScheduleTime
+				ScheduleTime = 0
+				print "[%s][doneConfiguring] Schedule Disabled at" % self.schedulename, strftime("%c", localtime(now))
+				autoScheduleTimer.backupstop()
+		if ScheduleTime > 0:
+			t = localtime(ScheduleTime)
+			scheduletext = strftime(_("%a %e %b  %-H:%M"), t)
 		else:
-			radiotimesemulatortext = ""
+			scheduletext = ""

@@ -27,7 +27,7 @@ except:
 
 # from this plugin
 from providers import Providers, emulator_path, epg_import_sources_path, ProviderConfig
-from RadioTimesEmulator import RadioTimesEmulator, RadioTimesEmulatorautostart, AutoRadioTimesEmulatorTimer
+from RadioTimesEmulator import RadioTimesEmulator, AutoScheduleTimer, Scheduleautostart
 from about import RadioTimesEmulatorAbout
 
 paths = []
@@ -198,7 +198,7 @@ class RadioTimesEmulatorGUIScreen(ConfigListScreen, Screen):
 		config.plugins.RadioTimesEmulator.database_location.save()
 		configfile.save()
 		try:
-			AutoRadioTimesEmulatorTimer.instance.doneConfiguring()
+			AutoScheduleTimer.instance.doneConfiguring()
 		except AttributeError as e:
 			print "[RadioTimesEmulator] Timer.instance not available for reconfigure.", e
 
@@ -287,7 +287,7 @@ def Plugins(**kwargs):
 	description = _("Creates XML files from OpenTV for use by EPG-Import plugin")
 	pList = []
 	if pathExists(emulator_path) or any([nimmanager.hasNimType(x) for x in ["DVB-S"]]):
-		pList.append(PluginDescriptor(name="RadioTimesEmulatorSessionStart", where=PluginDescriptor.WHERE_SESSIONSTART, fnc=RadioTimesEmulatorautostart, needsRestart=True))
+		pList.append(PluginDescriptor(name="RadioTimesEmulatorSessionStart", where=PluginDescriptor.WHERE_SESSIONSTART, fnc=Scheduleautostart, needsRestart=True))
 		pList.append(PluginDescriptor(name=name, description=description, where=PluginDescriptor.WHERE_MENU, fnc=RadioTimesEmulatorGUIStart, needsRestart=True) )
 		if getImageDistro() in ("UNKNOWN",):
 			pList.append(PluginDescriptor(name=name, description=description, where=PluginDescriptor.WHERE_PLUGINMENU, fnc=start_from_plugins_menu, needsRestart=True))
