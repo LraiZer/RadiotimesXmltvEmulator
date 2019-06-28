@@ -7,7 +7,7 @@ class RadioTimesEmulatorAbout(Screen):
 	def __init__(self, session):
 		self.session = session
 		Screen.__init__(self, session)
-		Screen.setTitle(self, _("Radio Times Emulator GUI") + " - " + _("About"))
+		Screen.setTitle(self, _("Radio Times Emulator") + " - " + _("About"))
 		self.skinName = ["RadioTimesEmulatorAbout", "Setup"]
 
 		self["config"] = Label("")
@@ -22,20 +22,18 @@ class RadioTimesEmulatorAbout(Screen):
 		self["key_red"] = Label(_("Exit"))
 
 		credits = [
-			"Radio Times Emulator Gui (c) 2019 \n",
-			"https://github.com/oe-alliance/oe-alliance-plugins\n",
+			"Radio Times Emulator Plugin (c) 2019\n",
+			"https://github.com/LraiZer/RadiotimesXmltvEmulator/\n",
 			"http://www.world-of-satellite.com\n\n",
 			"Application credits:\n",
+			"- LraiZer (binary developer)\n",
 			"- Huevos (GUI developer)\n",
 			"- Abu Baniaz (requesting and testing)\n\n",
 			"Sources credits:\n",
-			"- Radio Times Xmltv Emulator binary\n",
-			"- LraiZer (binary developer)\n",
-			"- https://github.com/LraiZer/RadiotimesXmltvEmulator/\n",
 			"- Binary derived from CrossEPG open source code\n",
+			"- https://github.com/oe-alliance/e2openplugin-CrossEPG\n",
 		]
 		self["config"].setText(''.join(credits))
 
 	def keyCancel(self):
 		self.close()
-

@@ -3,8 +3,8 @@ from Components.Language import language
 from Tools.Directories import resolveFilename, SCOPE_PLUGINS, SCOPE_LANGUAGE
 import gettext
 
-PluginLanguageDomain = "RadioTimesEmulatorGUI"
-PluginLanguagePath = "SystemPlugins/RadioTimesEmulatorGUI/locale"
+PluginLanguageDomain = "RadioTimesEmulator"
+PluginLanguagePath = "SystemPlugins/RadioTimesEmulator/locale"
 
 def localeInit():
 	gettext.bindtextdomain(PluginLanguageDomain, resolveFilename(SCOPE_PLUGINS, PluginLanguagePath))

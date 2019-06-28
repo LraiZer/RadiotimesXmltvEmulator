@@ -62,7 +62,7 @@ class RadioTimesEmulator(Screen):
 		self.LOCK_TIMEOUT_FIXED = 50 	# 100ms for tick - 5 sec
 		
 		self.LOCK_TIMEOUT = self.LOCK_TIMEOUT_FIXED
-		self.databaseLocation = "%sradiotimes" % config.plugins.RadioTimesEmulatorGUI.database_location.value
+		self.databaseLocation = "%sradiotimes" % config.plugins.RadioTimesEmulator.database_location.value
 		self.providers = Providers().read()
 		self.onClose.append(self.__onClose)
 		self.onFirstExecBegin.append(self.firstExec)
@@ -83,7 +83,7 @@ class RadioTimesEmulator(Screen):
 		self.selectedProviders = {}
 		self.actionsList = []
 
-		providers_tmp = config.plugins.RadioTimesEmulatorGUI.providers.value.split("|")
+		providers_tmp = config.plugins.RadioTimesEmulator.providers.value.split("|")
 
 		for provider_tmp in providers_tmp:
 			provider_config = ProviderConfig(provider_tmp)
@@ -399,8 +399,8 @@ class RadioTimesEmulator(Screen):
 			self.actionsList[self.index], # provider key
 			self.demuxer_id,
 			self.selectedNIM,
-			config.plugins.RadioTimesEmulatorGUI.no_dvb_polling.value and " -n" or "",
-			config.plugins.RadioTimesEmulatorGUI.carousel_dvb_polling.value and " -c" or "",
+			config.plugins.RadioTimesEmulator.no_dvb_polling.value and " -n" or "",
+			config.plugins.RadioTimesEmulator.carousel_dvb_polling.value and " -c" or "",
 			" -r",
 		)
 
@@ -457,7 +457,7 @@ class AutoRadioTimesEmulatorTimer:
 		self.radiotimesemulatoractivityTimer.timeout.get().append(self.radiotimesemulatordatedelay)
 		now = int(time())
 		global RadioTimesEmulatorTime
-		if config.plugins.RadioTimesEmulatorGUI.schedule.value:
+		if config.plugins.RadioTimesEmulator.schedule.value:
 			print "[RadioTimesEmulator][AutoRadioTimesEmulatorTimer] Schedule Enabled at ", strftime("%c", localtime(now))
 			if now > 1262304000:
 				self.radiotimesemulatordate()
@@ -481,7 +481,7 @@ class AutoRadioTimesEmulatorTimer:
 		self.radiotimesemulatordate()
 
 	def getRadioTimesEmulatorTime(self):
-		backupclock = config.plugins.RadioTimesEmulatorGUI.scheduletime.value
+		backupclock = config.plugins.RadioTimesEmulator.scheduletime.value
 		nowt = time()
 		now = localtime(nowt)
 		return int(mktime((now.tm_year, now.tm_mon, now.tm_mday, backupclock[0], backupclock[1], 0, now.tm_wday, now.tm_yday, now.tm_isdst)))
@@ -493,19 +493,19 @@ class AutoRadioTimesEmulatorTimer:
 		now = int(time())
 		if RadioTimesEmulatorTime > 0:
 			if RadioTimesEmulatorTime < now + atLeast:
-				if config.plugins.RadioTimesEmulatorGUI.repeattype.value == "daily":
+				if config.plugins.RadioTimesEmulator.repeattype.value == "daily":
 					RadioTimesEmulatorTime += 24*3600
 					while (int(RadioTimesEmulatorTime)-30) < now:
 						RadioTimesEmulatorTime += 24*3600
-				elif config.plugins.RadioTimesEmulatorGUI.repeattype.value == "every 3 days":
+				elif config.plugins.RadioTimesEmulator.repeattype.value == "every 3 days":
 					RadioTimesEmulatorTime += 3*24*3600
 					while (int(RadioTimesEmulatorTime)-30) < now:
 						RadioTimesEmulatorTime += 3*24*3600
-				elif config.plugins.RadioTimesEmulatorGUI.repeattype.value == "weekly":
+				elif config.plugins.RadioTimesEmulator.repeattype.value == "weekly":
 					RadioTimesEmulatorTime += 7*24*3600
 					while (int(RadioTimesEmulatorTime)-30) < now:
 						RadioTimesEmulatorTime += 7*24*3600
-#				elif config.plugins.RadioTimesEmulatorGUI.repeattype.value == "monthly":
+#				elif config.plugins.RadioTimesEmulator.repeattype.value == "monthly":
 #					RadioTimesEmulatorTime += 30*24*3600
 #					while (int(RadioTimesEmulatorTime)-30) < now:
 #						RadioTimesEmulatorTime += 30*24*3600
@@ -540,19 +540,19 @@ class AutoRadioTimesEmulatorTimer:
 	def doRadioTimesEmulator(self, answer):
 		now = int(time())
 		if answer is False:
-			if config.plugins.RadioTimesEmulatorGUI.retrycount.value < 2:
+			if config.plugins.RadioTimesEmulator.retrycount.value < 2:
 				print "[RadioTimesEmulator][doRadioTimesEmulator] RadioTimesEmulator delayed."
-				repeat = config.plugins.RadioTimesEmulatorGUI.retrycount.value
+				repeat = config.plugins.RadioTimesEmulator.retrycount.value
 				repeat += 1
-				config.plugins.RadioTimesEmulatorGUI.retrycount.value = repeat
-				RadioTimesEmulatorTime = now + (int(config.plugins.RadioTimesEmulatorGUI.retry.value) * 60)
+				config.plugins.RadioTimesEmulator.retrycount.value = repeat
+				RadioTimesEmulatorTime = now + (int(config.plugins.RadioTimesEmulator.retry.value) * 60)
 				print "[RadioTimesEmulator][doRadioTimesEmulator] Time now set to", strftime("%c", localtime(RadioTimesEmulatorTime)), strftime("(now=%c)", localtime(now))
-				self.radiotimesemulatortimer.startLongTimer(int(config.plugins.RadioTimesEmulatorGUI.retry.value) * 60)
+				self.radiotimesemulatortimer.startLongTimer(int(config.plugins.RadioTimesEmulator.retry.value) * 60)
 			else:
 				atLeast = 60
 				print "[RadioTimesEmulator][doRadioTimesEmulator] Enough Retries, delaying till next schedule.", strftime("%c", localtime(now))
 				self.session.open(MessageBox, _("Enough Retries, delaying till next schedule."), MessageBox.TYPE_INFO, timeout = 10)
-				config.plugins.RadioTimesEmulatorGUI.retrycount.value = 0
+				config.plugins.RadioTimesEmulator.retrycount.value = 0
 				self.radiotimesemulatordate(atLeast)
 		else:
 			self.timer = eTimer()
@@ -565,7 +565,7 @@ class AutoRadioTimesEmulatorTimer:
 
 	def doneConfiguring(self): # called from plugin on save
 		now = int(time())
-		if config.plugins.RadioTimesEmulatorGUI.schedule.value:
+		if config.plugins.RadioTimesEmulator.schedule.value:
 			if autoRadioTimesEmulatorTimer is not None:
 				print "[RadioTimesEmulator][doneConfiguring] Schedule Enabled at", strftime("%c", localtime(now))
 				autoRadioTimesEmulatorTimer.radiotimesemulatordate()

@@ -42,16 +42,16 @@ def updatePaths():
 
 updatePaths()
 
-config.plugins.RadioTimesEmulatorGUI = ConfigSubsection()
-config.plugins.RadioTimesEmulatorGUI.database_location = ConfigSelection(default=default_path, choices=paths)
-config.plugins.RadioTimesEmulatorGUI.providers = ConfigText("", False)
-config.plugins.RadioTimesEmulatorGUI.no_dvb_polling = ConfigYesNo(default=False)
-config.plugins.RadioTimesEmulatorGUI.carousel_dvb_polling = ConfigYesNo(default=False)
-config.plugins.RadioTimesEmulatorGUI.schedule = ConfigYesNo(default = False)
-config.plugins.RadioTimesEmulatorGUI.scheduletime = ConfigClock(default = 0) # 1:00
-config.plugins.RadioTimesEmulatorGUI.repeattype = ConfigSelection(default = "daily", choices = [("daily", _("Daily")), ("every 3 days", _("Every 3 days")), ("weekly", _("Weekly"))]) #
-config.plugins.RadioTimesEmulatorGUI.retry = ConfigNumber(default = 30)
-config.plugins.RadioTimesEmulatorGUI.retrycount = NoSave(ConfigNumber(default = 0))
+config.plugins.RadioTimesEmulator = ConfigSubsection()
+config.plugins.RadioTimesEmulator.database_location = ConfigSelection(default=default_path, choices=paths)
+config.plugins.RadioTimesEmulator.providers = ConfigText("", False)
+config.plugins.RadioTimesEmulator.no_dvb_polling = ConfigYesNo(default=False)
+config.plugins.RadioTimesEmulator.carousel_dvb_polling = ConfigYesNo(default=False)
+config.plugins.RadioTimesEmulator.schedule = ConfigYesNo(default = False)
+config.plugins.RadioTimesEmulator.scheduletime = ConfigClock(default = 0) # 1:00
+config.plugins.RadioTimesEmulator.repeattype = ConfigSelection(default = "daily", choices = [("daily", _("Daily")), ("every 3 days", _("Every 3 days")), ("weekly", _("Weekly"))]) #
+config.plugins.RadioTimesEmulator.retry = ConfigNumber(default = 30)
+config.plugins.RadioTimesEmulator.retrycount = NoSave(ConfigNumber(default = 0))
 
 def onPartitionChange(why, part):
 	if why == 'add':
@@ -64,20 +64,20 @@ def onMountpointAdded(mountpoint):
 	global default_path
 	if mountpoint not in paths:
 		paths.append(mountpoint)
-		config.plugins.RadioTimesEmulatorGUI.database_location.setChoices(choices=paths, default=default_path)
+		config.plugins.RadioTimesEmulator.database_location.setChoices(choices=paths, default=default_path)
 
 def onMountpointRemoved(mountpoint):
 	global paths
 	global default_path
-	pathRemoved = config.plugins.RadioTimesEmulatorGUI.database_location.value == mountpoint
+	pathRemoved = config.plugins.RadioTimesEmulator.database_location.value == mountpoint
 	if mountpoint in paths:
 		paths.remove(mountpoint)
 	if mountpoint == default_path:
 		default_path = "/tmp/"
-	config.plugins.RadioTimesEmulatorGUI.database_location.setChoices(choices=paths, default=default_path)
+	config.plugins.RadioTimesEmulator.database_location.setChoices(choices=paths, default=default_path)
 	if pathRemoved:
-		config.plugins.RadioTimesEmulatorGUI.database_location.value = default_path
-		config.plugins.RadioTimesEmulatorGUI.database_location.save()
+		config.plugins.RadioTimesEmulator.database_location.value = default_path
+		config.plugins.RadioTimesEmulator.database_location.save()
 		configfile.save()
 
 harddiskmanager.on_partition_list_change.append(onPartitionChange)
@@ -138,7 +138,7 @@ class RadioTimesEmulatorGUIScreen(ConfigListScreen, Screen):
 
 		# read providers configurations
 		providers_tmp_configs = {}
-		providers_tmp = config.plugins.RadioTimesEmulatorGUI.providers.value.split("|")
+		providers_tmp = config.plugins.RadioTimesEmulator.providers.value.split("|")
 		for provider_tmp in providers_tmp:
 			provider_config = ProviderConfig(provider_tmp)
 
@@ -164,18 +164,18 @@ class RadioTimesEmulatorGUIScreen(ConfigListScreen, Screen):
 		indent = "- "
 		self.list = []
 		self.providers_enabled = []
-		self.list.append(getConfigListEntry(_("Database location"), config.plugins.RadioTimesEmulatorGUI.database_location, _('Select the path where you want to save the files created by Radio Times Xmltv Emulator. The files will be read from this location. Locating the database in "/tmp/" means it will be lost on reboots.')))
+		self.list.append(getConfigListEntry(_("Database location"), config.plugins.RadioTimesEmulator.database_location, _('Select the path where you want to save the files created by Radio Times Xmltv Emulator. The files will be read from this location. Locating the database in "/tmp/" means it will be lost on reboots.')))
 		for provider in self.providerKeysInNameOrder(self.providers):
 			if self.providers[provider]["transponder"]["orbital_position"] not in self.orbital_supported:
 				continue
 			self.list.append(getConfigListEntry(self.providers[provider]["name"], self.providers_configs[provider], _("This option enables fetching EPG data for the currently selected provider.")))
 			self.providers_enabled.append(provider)
-		self.list.append(getConfigListEntry(_("No dvb polling"), config.plugins.RadioTimesEmulatorGUI.no_dvb_polling, _('Only select this option if you fully understand why you need it, otherwise leave it "off".')))
-		self.list.append(getConfigListEntry(_("Carousel dvb polling"), config.plugins.RadioTimesEmulatorGUI.carousel_dvb_polling, _('Only select this option if you fully understand why you need it, otherwise leave it "off".')))
-		self.list.append(getConfigListEntry(_("Scheduled scan"), config.plugins.RadioTimesEmulatorGUI.schedule, _("Set up a task scheduler to automatically download the EPG data.")))
-		if config.plugins.RadioTimesEmulatorGUI.schedule.value:
-			self.list.append(getConfigListEntry(indent + _("Schedule time of day"), config.plugins.RadioTimesEmulatorGUI.scheduletime, _("Set the time of day to perform the EPG scan.")))
-			self.list.append(getConfigListEntry(indent + _("Schedule repeat interval"), config.plugins.RadioTimesEmulatorGUI.repeattype, _("Set how often the scan should be done.")))
+		self.list.append(getConfigListEntry(_("No dvb polling"), config.plugins.RadioTimesEmulator.no_dvb_polling, _('Only select this option if you fully understand why you need it, otherwise leave it "off".')))
+		self.list.append(getConfigListEntry(_("Carousel dvb polling"), config.plugins.RadioTimesEmulator.carousel_dvb_polling, _('Only select this option if you fully understand why you need it, otherwise leave it "off".')))
+		self.list.append(getConfigListEntry(_("Scheduled scan"), config.plugins.RadioTimesEmulator.schedule, _("Set up a task scheduler to automatically download the EPG data.")))
+		if config.plugins.RadioTimesEmulator.schedule.value:
+			self.list.append(getConfigListEntry(indent + _("Schedule time of day"), config.plugins.RadioTimesEmulator.scheduletime, _("Set the time of day to perform the EPG scan.")))
+			self.list.append(getConfigListEntry(indent + _("Schedule repeat interval"), config.plugins.RadioTimesEmulator.repeattype, _("Set how often the scan should be done.")))
 
 		self["config"].list = self.list
 		self["config"].l.setList(self.list)
@@ -193,12 +193,15 @@ class RadioTimesEmulatorGUIScreen(ConfigListScreen, Screen):
 				provider_config.setProvider(provider)
 				config_string += provider_config.serialize()
 				
-		config.plugins.RadioTimesEmulatorGUI.providers.value = config_string
-		config.plugins.RadioTimesEmulatorGUI.providers.save()
-		config.plugins.RadioTimesEmulatorGUI.database_location.save()
+		config.plugins.RadioTimesEmulator.providers.value = config_string
+		config.plugins.RadioTimesEmulator.providers.save()
+		config.plugins.RadioTimesEmulator.database_location.save()
 		configfile.save()
-		AutoRadioTimesEmulatorTimer.instance.doneConfiguring()
-		
+		try:
+			AutoRadioTimesEmulatorTimer.instance.doneConfiguring()
+		except AttributeError as e:
+			print "[RadioTimesEmulator] Timer.instance not available for reconfigure.", e
+
 	def selectionChanged(self):
 		self["description"].setText(self["config"].getCurrent()[2])
 
@@ -206,7 +209,7 @@ class RadioTimesEmulatorGUIScreen(ConfigListScreen, Screen):
 	def changedEntry(self):
 		for x in self.onChangedEntry:
 			x()
-		if self["config"].getCurrent() and len(self["config"].getCurrent()) > 1 and self["config"].getCurrent()[1] == config.plugins.RadioTimesEmulatorGUI.schedule:
+		if self["config"].getCurrent() and len(self["config"].getCurrent()) > 1 and self["config"].getCurrent()[1] == config.plugins.RadioTimesEmulator.schedule:
 			self.createSetup()
 
 	def getCurrentEntry(self):
@@ -266,7 +269,7 @@ class RadioTimesEmulatorGUIScreen(ConfigListScreen, Screen):
 
 def RadioTimesEmulatorGUIStart(menuid, **kwargs):
 	if menuid == "epg_menu" and getImageDistro() in ("teamblue",) or menuid == "epg":
-		return [(_("Radio Times Emulator GUI"), RadioTimesEmulatorGUIMain, "RadioTimesEmulatorGUIScreen", 1000, True)]
+		return [(_("Radio Times Emulator OpenTV Import"), RadioTimesEmulatorGUIMain, "RadioTimesEmulatorGUIScreen", 1000, True)]
 	return []
 
 def start_from_plugins_menu(session, **kwargs):
@@ -280,14 +283,14 @@ def RadioTimesEmulatorGUICallback(close, answer):
 		close(True)
 
 def Plugins(**kwargs):
-	name = _("Radio Times Emulator GUI")
+	name = _("Radio Times Emulator OpenTV Downloader")
 	description = _("Creates XML files from OpenTV for use by EPG-Import plugin")
 	pList = []
 	if pathExists(emulator_path) or any([nimmanager.hasNimType(x) for x in ["DVB-S"]]):
 		pList.append(PluginDescriptor(name="RadioTimesEmulatorSessionStart", where=PluginDescriptor.WHERE_SESSIONSTART, fnc=RadioTimesEmulatorautostart, needsRestart=True))
-		pList.append(PluginDescriptor(name=name, description=description, where=PluginDescriptor.WHERE_MENU, fnc=RadioTimesEmulatorGUIStart, needsRestart=False) )
+		pList.append(PluginDescriptor(name=name, description=description, where=PluginDescriptor.WHERE_MENU, fnc=RadioTimesEmulatorGUIStart, needsRestart=True) )
 		if getImageDistro() in ("UNKNOWN",):
-			pList.append(PluginDescriptor(name=name, description=description, where=PluginDescriptor.WHERE_PLUGINMENU, fnc=start_from_plugins_menu, needsRestart=False))
+			pList.append(PluginDescriptor(name=name, description=description, where=PluginDescriptor.WHERE_PLUGINMENU, fnc=start_from_plugins_menu, needsRestart=True))
 	else:
 		print "[RadioTimesEmulatorGUI] RadioTimesEmulator appears to be missing or no DVB-S tuner available."
 	return pList
