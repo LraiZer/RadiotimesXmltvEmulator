@@ -27,7 +27,8 @@ except:
 
 # from this plugin
 from providers import Providers, emulator_path, epg_import_sources_path, ProviderConfig
-from RadioTimesEmulator import RadioTimesEmulator, AutoScheduleTimer, Scheduleautostart
+from RadioTimesEmulator import RadioTimesEmulator
+from RadioTimesEmulatorSchedule import AutoScheduleTimer, Scheduleautostart
 from about import RadioTimesEmulatorAbout
 
 paths = []
