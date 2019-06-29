@@ -87,7 +87,7 @@ harddiskmanager.on_partition_list_change.append(onPartitionChange)
 class RadioTimesEmulatorGUIScreen(ConfigListScreen, Screen):
 	def __init__(self, session):
 		Screen.__init__(self, session)
-		self.setup_title = _('Radio Times Emulator GUI - Setup')
+		self.setup_title = _('Radio Times Emulator') + " - " + _('Setup')
 		Screen.setTitle(self, self.setup_title)
 		self.skinName = ["RadioTimesEmulatorGUIScreen", "Setup"]
 		self.onChangedEntry = []
@@ -231,14 +231,15 @@ class RadioTimesEmulatorGUIScreen(ConfigListScreen, Screen):
 		self.session.openWithCallback(self.RadioTimesEmulatorCallback, RadioTimesEmulator, {})
 
 	def RadioTimesEmulatorCallback(self, answer=None):
-		print "answer", answer
-		self.session.nav.playService(self.session.postScanService)
-		if answer:
-			self.close(True)
+		print "[RadioTimesEmulatorGUI]answer", answer
+#		self.session.nav.playService(self.session.postScanService)
+#		if answer:
+#			self.close(True)
+		self["description"].setText(_("The download has completed.") + " " +  _("Please don't forget that after downloading the first time the selected providers will need to be enabled in EPG-Importer plugin."))
 
 	def keySave(self):
 		self.saveAll()
-		self["description"].setText(_("The current configuration has been saved. After downloading the first time the selected providers will need to be enabled in EPG-Importer plugin."))
+		self["description"].setText(_("The current configuration has been saved.") + " " +  _("Please don't forget that after downloading the first time the selected providers will need to be enabled in EPG-Importer plugin."))
 
 	def keyCancel(self):
 		if self["config"].isChanged():
