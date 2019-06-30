@@ -173,10 +173,10 @@ class RadioTimesEmulatorGUIScreen(ConfigListScreen, Screen):
 			self.providers_enabled.append(provider)
 		self.list.append(getConfigListEntry(_("No dvb polling"), config.plugins.RadioTimesEmulator.no_dvb_polling, _('Only select this option if you fully understand why you need it, otherwise leave it "off".')))
 		self.list.append(getConfigListEntry(_("Carousel dvb polling"), config.plugins.RadioTimesEmulator.carousel_dvb_polling, _('Only select this option if you fully understand why you need it, otherwise leave it "off".')))
-		self.list.append(getConfigListEntry(_("Scheduled scan"), config.plugins.RadioTimesEmulator.schedule, _("Set up a task scheduler to automatically download the EPG data.")))
+		self.list.append(getConfigListEntry(_("Scheduled fetch"), config.plugins.RadioTimesEmulator.schedule, _("Set up a task scheduler to automatically fetch the EPG data.")))
 		if config.plugins.RadioTimesEmulator.schedule.value:
-			self.list.append(getConfigListEntry(indent + _("Schedule time of day"), config.plugins.RadioTimesEmulator.scheduletime, _("Set the time of day to perform the EPG scan.")))
-			self.list.append(getConfigListEntry(indent + _("Schedule repeat interval"), config.plugins.RadioTimesEmulator.repeattype, _("Set how often the scan should be done.")))
+			self.list.append(getConfigListEntry(indent + _("Schedule time of day"), config.plugins.RadioTimesEmulator.scheduletime, _("Set the time of day to fetch the EPG.")))
+			self.list.append(getConfigListEntry(indent + _("Schedule repeat interval"), config.plugins.RadioTimesEmulator.repeattype, _("Set how often the EPG should be fetched.")))
 
 		self["config"].list = self.list
 		self["config"].l.setList(self.list)
@@ -286,7 +286,7 @@ def RadioTimesEmulatorGUICallback(close, answer):
 
 def Plugins(**kwargs):
 	name = _("Radio Times Emulator OpenTV Downloader")
-	description = _("Creates XML files from OpenTV for use by EPG-Import plugin")
+	description = _("Creates XML files from OpenTV for use by EPG-Importer plugin")
 	pList = []
 	if pathExists(emulator_path) or any([nimmanager.hasNimType(x) for x in ["DVB-S"]]):
 		pList.append(PluginDescriptor(name="RadioTimesEmulatorSessionStart", where=PluginDescriptor.WHERE_SESSIONSTART, fnc=Scheduleautostart, needsRestart=True))
