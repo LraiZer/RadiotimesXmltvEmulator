@@ -121,6 +121,7 @@ install-gui:
 	install -m 644 enigma2/python/LICENSE $(D)${libdir}/enigma2/python/Plugins/SystemPlugins/RadioTimesEmulator/
 	install -m 644 enigma2/python/LICENSE.GPLv2 $(D)${libdir}/enigma2/python/Plugins/SystemPlugins/RadioTimesEmulator/
 	install -m 644 enigma2/python/README.txt $(D)${libdir}/enigma2/python/Plugins/SystemPlugins/RadioTimesEmulator/
+	install -m 644 ./Radio-Times-EPG-Emulator.pdf $(D)${libdir}/enigma2/python/Plugins/SystemPlugins/RadioTimesEmulator/
 
 install-standalone:
 	install -d $(D)/usr/radiotimes_emulator/providers
