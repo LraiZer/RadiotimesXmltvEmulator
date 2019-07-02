@@ -1,0 +1,59 @@
+language: shell
+dist: trusty
+sudo: false
+
+python:
+  - "2.7"
+
+compiler:
+  - gcc
+
+cache:
+  apt: true
+
+git:
+  depth: 3
+
+branches:
+  only:
+  - gui-plugin
+
+matrix:
+  include:
+    - name: "GNU Compiler Collection 5"
+      env: CC=gcc-5 CXX=g++-5
+      addons:
+        apt:
+          sources: &sources
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-5
+    - name: "GNU Compiler Collection 6"
+      env: CC=gcc-6 CXX=g++-6
+      addons:
+        apt:
+          sources: *sources
+          packages:
+            - g++-6
+    - name: "GNU Compiler Collection 7"
+      env: CC=gcc-7 CXX=g++-7
+      addons:
+        apt:
+          sources: *sources
+          packages:
+            - g++-7
+    - name: "GNU Compiler Collection 8"
+      env: CC=gcc-8 CXX=g++-8
+      addons:
+        apt:
+          sources: *sources
+          packages:
+            - g++-8
+
+script:
+  - export CXXFLAGS="-g -Wall"
+  - export CFLAGS="-g -Wall"
+  - export STRIP="strip"
+  - make
+  - python -m compileall -l enigma2/python
+  - find . -type f -name "*.po" -exec msgfmt {} -o {}.mo \;
