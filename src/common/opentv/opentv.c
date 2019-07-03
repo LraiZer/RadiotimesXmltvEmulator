@@ -189,8 +189,8 @@ bool opentv_read_channels_bat (unsigned char *data, unsigned int length, char *d
 					if (channels[channel_id] == NULL)
 					{
 						FILE *outfile;
-						char name_file[256];
-						memset(name_file, '\0', 256);
+						char name_file[MAX_FILENAME_SIZE];
+						memset(name_file, '\0', MAX_FILENAME_SIZE);
 						sprintf(name_file, "%s/%s.channels.xml", db_root, provider);
 						outfile = fopen(name_file,"a");
 						fprintf(outfile,"<!-- %s --><channel id=\"%i_%i_%i\">1:0:%X:%X:%X:%X:%X:0:0:0:</channel><!-- \"%s\" -->\n",
@@ -390,8 +390,8 @@ void opentv_read_summaries (unsigned char *data, unsigned int length, bool huffm
 					strftime (mtime_e, sizeof(mtime_e), "%Y%m%d%H%M%S %z", loctime_e);
 
 					FILE *outfile;
-					char name_file[256];
-					memset(name_file, '\0', 256);
+					char name_file[MAX_FILENAME_SIZE];
+					memset(name_file, '\0', MAX_FILENAME_SIZE);
 					sprintf(name_file, "%s/%s.xml", db_root, provider);
 					outfile = fopen(name_file,"a");
 					fprintf(outfile, " <programme start=\"%s\" stop=\"%s\" channel=\"%i_%i_%i\">\n", mtime_s, mtime_e, providers_get_orbital_position(), channels[channel_id]->nid, channel_id);
@@ -435,12 +435,12 @@ bool opentv_read_themes (char *file)
 		if(sscanf(line, "%[^=] =%[^\n] ", string1, string2) == 2)
 		{
 			genre[genre_id] = _malloc (sizeof (char) * (strlen (string2) + 1));
-			snprintf((char *) genre[genre_id], 255, "%s", string2);
+			snprintf((char *) genre[genre_id], 256, "%s", string2);
 		}
 		else
 		{
 			genre[genre_id] = _malloc (sizeof (char) * (strlen (string1) + 10));
-			snprintf((char *) genre[genre_id], 255, "Genre %s", string1);
+			snprintf((char *) genre[genre_id], 256+6, "Genre %s", string1);
 		}
 		genre_id++;
 	}

@@ -20,7 +20,7 @@ void log_disable ()
 }
 bool log_new (char *db_root)
 {
-	char log_filename[256];
+	char log_filename[MAX_FILENAME_SIZE];
 	sprintf (log_filename, "%s/%s.log", db_root, provider);
 
 	fd = fopen (log_filename, "w");
@@ -32,7 +32,7 @@ bool log_new (char *db_root)
 
 bool log_open (char *db_root)
 {	
-	char log_filename[256];
+	char log_filename[MAX_FILENAME_SIZE];
 	sprintf (log_filename, "%s/%s.log", db_root, provider);
 
 	fd = fopen (log_filename, "a");
