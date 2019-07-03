@@ -157,13 +157,13 @@ void dvb_read (dvb_t *settings, bool(*data_callback)(int, unsigned char*))
 		{
 			if (carousel_dvb_poll)
 			{
-				char dmx_dev[256];
-				memset(dmx_dev, '\0', 256);
+				char dmx_dev[256*2];
+				memset(dmx_dev, '\0', 256*2);
 				sprintf(dmx_dev, "%s%i", dmx_adpt, dmx_next++);
 				if ((PFD[i].fd = open (dmx_dev, O_RDONLY|O_CLOEXEC|O_NONBLOCK)) < 0)
 				{
 					dmx_next = 0;
-					memset(dmx_dev, '\0', 256);
+					memset(dmx_dev, '\0', 256*2);
 					sprintf(dmx_dev, "%s%i", dmx_adpt, dmx_next++);
 					PFD[i].fd = open (dmx_dev, O_RDONLY|O_CLOEXEC|O_NONBLOCK);
 				}

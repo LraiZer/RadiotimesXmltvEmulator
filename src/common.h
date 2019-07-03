@@ -12,6 +12,8 @@ typedef enum type_bool {false = 0, true} bool;
 
 #define DEFAULT_DEMUXER		"/dev/dvb/adapter0/demux0"
 
+#define MAX_FILENAME_SIZE	256*2+20
+
 char provider[256];
 bool no_dvb_poll;
 bool carousel_dvb_poll;

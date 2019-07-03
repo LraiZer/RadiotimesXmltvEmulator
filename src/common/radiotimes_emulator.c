@@ -168,8 +168,8 @@ void download_opentv ()
 {
 	int i;
 	dvb_t settings;
-	char dictionary[256];
-	char themes[256];
+	char dictionary[MAX_FILENAME_SIZE];
+	char themes[MAX_FILENAME_SIZE];
 
 	log_add ("Started RadioTimes XMLTV (e2xmltv) emulation");
 	log_add ("Started OpenTV events download, DVB poll %s\n", no_dvb_poll ? "disabled" : "enabled");
@@ -196,8 +196,8 @@ void download_opentv ()
 		dvb_read (&settings, *sdt_callback);
 
 		FILE *outfile;
-		char name_file[256];
-		memset(name_file, '\0', 256);
+		char name_file[MAX_FILENAME_SIZE];
+		memset(name_file, '\0', MAX_FILENAME_SIZE);
 		sprintf(name_file, "%s/%s.channels.xml", db_root, provider);
 		outfile = fopen(name_file,"w");
 		fprintf(outfile,"<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n<channels>\n");
@@ -218,7 +218,7 @@ void download_opentv ()
 		fflush(outfile);
 		fclose(outfile);
 
-		memset(name_file, '\0', 256);
+		memset(name_file, '\0', MAX_FILENAME_SIZE);
 		sprintf(name_file, "%s/%s.xml", db_root, provider);
 		outfile = fopen(name_file,"w");
 		fprintf(outfile,"<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n");
@@ -227,7 +227,7 @@ void download_opentv ()
 		fflush(outfile);
 		fclose(outfile);
 
-		memset(name_file, '\0', 256);
+		memset(name_file, '\0', MAX_FILENAME_SIZE);
 		sprintf(name_file, "%s/otv_%s.sources.xml", db_root, provider);
 		outfile = fopen(name_file,"w");
 		fprintf(outfile,"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<sources>\n");
@@ -338,7 +338,7 @@ opentv_stop:
 		epgdb_clean ();
 		opentv_cleanup();
 
-		memset(name_file, '\0', 256);
+		memset(name_file, '\0', MAX_FILENAME_SIZE);
 		sprintf(name_file, "%s/%s.xml", db_root, provider);
 		outfile = fopen(name_file,"a");
 		fprintf(outfile,"</tv>\n");
@@ -352,7 +352,8 @@ opentv_stop:
 
 void *download (void *args)
 {
-	char opentv_file[256];
+	char opentv_file[MAX_FILENAME_SIZE];
+	memset(opentv_file, '\0', MAX_FILENAME_SIZE);
 
 	sprintf (opentv_file, "%s/providers/%s.conf", homedir, provider);
 
@@ -458,8 +459,8 @@ int main (int argc, char **argv)
 	log_open (db_root);
 	log_banner ("RadioTimes XMLTV Emulator");
 
-
-	char opentv_file[256];
+	char opentv_file[MAX_FILENAME_SIZE];
+	memset(opentv_file, '\0', MAX_FILENAME_SIZE);
 
 	sprintf (opentv_file, "%s/providers/%s.conf", homedir, provider);
 	if (providers_read (opentv_file))
