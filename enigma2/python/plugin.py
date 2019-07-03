@@ -199,9 +199,10 @@ class RadioTimesEmulatorGUIScreen(ConfigListScreen, Screen):
 		config.plugins.RadioTimesEmulator.database_location.save()
 		configfile.save()
 		try:
-			AutoScheduleTimer.instance.doneConfiguring()
+			self.scheduleInfo = AutoScheduleTimer.instance.doneConfiguring()
 		except AttributeError as e:
 			print "[RadioTimesEmulator] Timer.instance not available for reconfigure.", e
+			self.scheduleInfo = ""
 
 	def selectionChanged(self):
 		self["description"].setText(self["config"].getCurrent()[2])
@@ -235,11 +236,11 @@ class RadioTimesEmulatorGUIScreen(ConfigListScreen, Screen):
 #		self.session.nav.playService(self.session.postScanService)
 #		if answer:
 #			self.close(True)
-		self["description"].setText(_("The download has completed.") + " " +  _("Please don't forget that after downloading the first time the selected providers will need to be enabled in EPG-Importer plugin."))
+		self["description"].setText(_("The download has completed.") + (self.scheduleInfo and " " + _("Next scheduled fetch is programmed for %s.") % self.scheduleInfo + " " or " ") +  _("Please don't forget that after downloading the first time the selected providers will need to be enabled in EPG-Importer plugin."))
 
 	def keySave(self):
 		self.saveAll()
-		self["description"].setText(_("The current configuration has been saved.") + " " +  _("Please don't forget that after downloading the first time the selected providers will need to be enabled in EPG-Importer plugin."))
+		self["description"].setText(_("The current configuration has been saved.") + (self.scheduleInfo and " " + _("Next scheduled fetch is programmed for %s.") % self.scheduleInfo + " " or " ") +  _("Please don't forget that after downloading the first time the selected providers will need to be enabled in EPG-Importer plugin."))
 
 	def keyCancel(self):
 		if self["config"].isChanged():

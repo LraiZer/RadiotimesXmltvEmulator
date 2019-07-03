@@ -156,9 +156,11 @@ class AutoScheduleTimer:
 				ScheduleTime = 0
 				print "[%s][doneConfiguring] Schedule Disabled at" % self.schedulename, strftime("%c", localtime(now))
 				autoScheduleTimer.backupstop()
+		# scheduletext is not used for anything but could be returned to the calling function to display in the GUI.
 		if ScheduleTime > 0:
 			t = localtime(ScheduleTime)
 			scheduletext = strftime(_("%a %e %b  %-H:%M"), t)
 		else:
 			scheduletext = ""
+		return scheduletext
 
