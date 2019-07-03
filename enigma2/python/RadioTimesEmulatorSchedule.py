@@ -62,10 +62,10 @@ class AutoScheduleTimer:
 		self.scheduledate()
 
 	def getScheduleTime(self):
-		backupclock = self.config.scheduletime.value
+		scheduleclock = self.config.scheduletime.value
 		nowt = time()
 		now = localtime(nowt)
-		return int(mktime((now.tm_year, now.tm_mon, now.tm_mday, backupclock[0], backupclock[1], 0, now.tm_wday, now.tm_yday, now.tm_isdst)))
+		return int(mktime((now.tm_year, now.tm_mon, now.tm_mday, scheduleclock[0], scheduleclock[1], 0, now.tm_wday, now.tm_yday, now.tm_isdst)))
 
 	def scheduledate(self, atLeast = 0):
 		self.scheduletimer.stop()
@@ -97,7 +97,7 @@ class AutoScheduleTimer:
 		print "[%s][scheduledate] Time set to" % self.schedulename, strftime("%c", localtime(ScheduleTime)), strftime("(now=%c)", localtime(now))
 		return ScheduleTime
 
-	def backupstop(self):
+	def schedulestop(self):
 		self.scheduletimer.stop()
 
 	def ScheduleonTimer(self):
@@ -155,7 +155,7 @@ class AutoScheduleTimer:
 				global ScheduleTime
 				ScheduleTime = 0
 				print "[%s][doneConfiguring] Schedule Disabled at" % self.schedulename, strftime("%c", localtime(now))
-				autoScheduleTimer.backupstop()
+				autoScheduleTimer.schedulestop()
 		# scheduletext is not used for anything but could be returned to the calling function to display in the GUI.
 		if ScheduleTime > 0:
 			t = localtime(ScheduleTime)
