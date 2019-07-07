@@ -289,7 +289,7 @@ def Plugins(**kwargs):
 	name = _("Radio Times Emulator OpenTV Downloader")
 	description = _("Creates XML files from OpenTV for use by EPG-Importer plugin")
 	pList = []
-	if pathExists(emulator_path) or any([nimmanager.hasNimType(x) for x in ["DVB-S"]]):
+	if pathExists(emulator_path) and any([nimmanager.hasNimType(x) for x in ["DVB-S"]]):
 		pList.append(PluginDescriptor(name="RadioTimesEmulatorSessionStart", where=PluginDescriptor.WHERE_SESSIONSTART, fnc=Scheduleautostart, needsRestart=True))
 		pList.append(PluginDescriptor(name=name, description=description, where=PluginDescriptor.WHERE_MENU, fnc=RadioTimesEmulatorGUIStart, needsRestart=True) )
 		if getImageDistro() in ("UNKNOWN",):
