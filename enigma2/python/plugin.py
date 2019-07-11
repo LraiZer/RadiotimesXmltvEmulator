@@ -2,7 +2,7 @@
 from . import _
 
 from Components.ActionMap import ActionMap
-from Components.config import config, ConfigClock, configfile, ConfigNumber, ConfigSubsection, ConfigSelection, ConfigText, ConfigYesNo, getConfigListEntry, NoSave
+from Components.config import config, ConfigClock, ConfigEnableDisable, configfile, ConfigNumber, ConfigSubsection, ConfigSelection, ConfigSubDict, ConfigText, ConfigYesNo, getConfigListEntry, NoSave
 from Components.ConfigList import ConfigListScreen
 from Components.Harddisk import harddiskmanager
 from Components.Label import Label
@@ -43,6 +43,9 @@ def updatePaths():
 
 updatePaths()
 
+days = (_("Monday"), _("Tuesday"), _("Wednesday"), _("Thursday"), _("Friday"), _("Saturday"), _("Sunday"))
+
+
 config.plugins.RadioTimesEmulator = ConfigSubsection()
 config.plugins.RadioTimesEmulator.database_location = ConfigSelection(default=default_path, choices=paths)
 config.plugins.RadioTimesEmulator.providers = ConfigText("", False)
@@ -50,9 +53,16 @@ config.plugins.RadioTimesEmulator.no_dvb_polling = ConfigYesNo(default=False)
 config.plugins.RadioTimesEmulator.carousel_dvb_polling = ConfigYesNo(default=False)
 config.plugins.RadioTimesEmulator.schedule = ConfigYesNo(default = False)
 config.plugins.RadioTimesEmulator.scheduletime = ConfigClock(default = 0) # 1:00
-config.plugins.RadioTimesEmulator.repeattype = ConfigSelection(default = "daily", choices = [("daily", _("Daily")), ("every 3 days", _("Every 3 days")), ("weekly", _("Weekly"))]) #
+config.plugins.RadioTimesEmulator.nextscheduletime = ConfigNumber(default = 0)
+config.plugins.RadioTimesEmulator.schedulewakefromdeep = ConfigYesNo(default = True)
+config.plugins.RadioTimesEmulator.schedulestandby = ConfigYesNo(default = True)
+config.plugins.RadioTimesEmulator.scheduleshutdown = ConfigYesNo(default = True)
+config.plugins.RadioTimesEmulator.dayscreen = ConfigSelection(choices = [("1", _("Press OK"))], default = "1")
 config.plugins.RadioTimesEmulator.retry = ConfigNumber(default = 30)
 config.plugins.RadioTimesEmulator.retrycount = NoSave(ConfigNumber(default = 0))
+config.plugins.RadioTimesEmulator.days = ConfigSubDict()
+for i in range(len(days)):
+	config.plugins.RadioTimesEmulator.days[i] = ConfigEnableDisable(default = True)
 
 def onPartitionChange(why, part):
 	if why == 'add':
@@ -90,13 +100,14 @@ class RadioTimesEmulatorGUIScreen(ConfigListScreen, Screen):
 		self.setup_title = _('Radio Times Emulator') + " - " + _('Setup')
 		Screen.setTitle(self, self.setup_title)
 		self.skinName = ["RadioTimesEmulatorGUIScreen", "Setup"]
+		self.config = config.plugins.RadioTimesEmulator
 		self.onChangedEntry = []
 		self.session = session
 		ConfigListScreen.__init__(self, [], session = session, on_change = self.changedEntry)
 
 		self["actions2"] = ActionMap(["SetupActions", "ColorActions"],
 		{
-			"ok": self.keyGo,
+			"ok": self.keyOk,
 			"menu": self.keyCancel,
 			"cancel": self.keyCancel,
 			"save": self.keySave,
@@ -117,7 +128,7 @@ class RadioTimesEmulatorGUIScreen(ConfigListScreen, Screen):
 		self.session.postScanService = self.session.nav.getCurrentlyPlayingServiceOrGroup()
 
 		self.prepare()
-		
+
 		self.createSetup()
 
 		if not self.selectionChanged in self["config"].onSelectionChanged:
@@ -139,7 +150,7 @@ class RadioTimesEmulatorGUIScreen(ConfigListScreen, Screen):
 
 		# read providers configurations
 		providers_tmp_configs = {}
-		providers_tmp = config.plugins.RadioTimesEmulator.providers.value.split("|")
+		providers_tmp = self.config.providers.value.split("|")
 		for provider_tmp in providers_tmp:
 			provider_config = ProviderConfig(provider_tmp)
 
@@ -159,24 +170,29 @@ class RadioTimesEmulatorGUIScreen(ConfigListScreen, Screen):
 		temp = []
 		for provider in providers.keys():
 			temp.append((provider, providers[provider]["name"]))
-		return [i[0] for i in sorted(temp, key=lambda p: p[1].lower().decode('ascii','ignore'))]		
+		return [i[0] for i in sorted(temp, key=lambda p: p[1].lower().decode('ascii','ignore'))]
 
 	def createSetup(self):
 		indent = "- "
 		self.list = []
 		self.providers_enabled = []
-		self.list.append(getConfigListEntry(_("Database location"), config.plugins.RadioTimesEmulator.database_location, _('Select the path where you want to save the files created by Radio Times Xmltv Emulator. The files will be read from this location. Locating the database in "/tmp/" means it will be lost on reboots.')))
+		self.list.append(getConfigListEntry(_("Database location"), self.config.database_location, _('Select the path where you want to save the files created by Radio Times Xmltv Emulator. The files will be read from this location. Locating the database in "/tmp/" means it will be lost on reboots.')))
 		for provider in self.providerKeysInNameOrder(self.providers):
 			if self.providers[provider]["transponder"]["orbital_position"] not in self.orbital_supported:
 				continue
 			self.list.append(getConfigListEntry(self.providers[provider]["name"], self.providers_configs[provider], _("This option enables fetching EPG data for the currently selected provider.")))
 			self.providers_enabled.append(provider)
-		self.list.append(getConfigListEntry(_("No dvb polling"), config.plugins.RadioTimesEmulator.no_dvb_polling, _('Only select this option if you fully understand why you need it, otherwise leave it "off".')))
-		self.list.append(getConfigListEntry(_("Carousel dvb polling"), config.plugins.RadioTimesEmulator.carousel_dvb_polling, _('Only select this option if you fully understand why you need it, otherwise leave it "off".')))
-		self.list.append(getConfigListEntry(_("Scheduled fetch"), config.plugins.RadioTimesEmulator.schedule, _("Set up a task scheduler to automatically fetch the EPG data.")))
-		if config.plugins.RadioTimesEmulator.schedule.value:
-			self.list.append(getConfigListEntry(indent + _("Schedule time of day"), config.plugins.RadioTimesEmulator.scheduletime, _("Set the time of day to fetch the EPG.")))
-			self.list.append(getConfigListEntry(indent + _("Schedule repeat interval"), config.plugins.RadioTimesEmulator.repeattype, _("Set how often the EPG should be fetched.")))
+		self.list.append(getConfigListEntry(_("No dvb polling"), self.config.no_dvb_polling, _('Only select this option if you fully understand why you need it, otherwise leave it "off".')))
+		self.list.append(getConfigListEntry(_("Carousel dvb polling"), self.config.carousel_dvb_polling, _('Only select this option if you fully understand why you need it, otherwise leave it "off".')))
+		self.list.append(getConfigListEntry(_("Scheduled fetch"), self.config.schedule, _("Set up a task scheduler to automatically fetch the EPG data.")))
+		if self.config.schedule.value:
+			self.list.append(getConfigListEntry(indent + _("Schedule time of day"), self.config.scheduletime, _("Set the time of day to fetch the EPG.")))
+			self.list.append(getConfigListEntry(indent + _("Schedule days of the week"), self.config.dayscreen, _("Press OK to select which days to fetch the EPG.")))
+			self.list.append(getConfigListEntry(indent + _("Schedule wake from deep standby"), self.config.schedulewakefromdeep, _("If the receiver is in 'Deep Standby' when the schedule is due wake it up to fetch the EPG.")))
+			if self.config.schedulewakefromdeep.value:
+				self.list.append(getConfigListEntry(indent + _("Schedule boot to standby"), self.config.schedulestandby, _("Boot to 'Standby'. Doing this confirms it is unlikeky someone is using the receiver.")))
+				if self.config.schedulestandby.value:
+					self.list.append(getConfigListEntry(indent + _("Schedule return to deep standby"), self.config.scheduleshutdown, _("If the receiver was woken from 'Deep Standby' and is currently in 'Standby' and no recordings are in progress return it to 'Deep Standby' once the import has completed.")))
 
 		self["config"].list = self.list
 		self["config"].l.setList(self.list)
@@ -193,10 +209,10 @@ class RadioTimesEmulatorGUIScreen(ConfigListScreen, Screen):
 				provider_config = ProviderConfig()
 				provider_config.setProvider(provider)
 				config_string += provider_config.serialize()
-				
-		config.plugins.RadioTimesEmulator.providers.value = config_string
-		config.plugins.RadioTimesEmulator.providers.save()
-		config.plugins.RadioTimesEmulator.database_location.save()
+
+		self.config.providers.value = config_string
+		self.config.providers.save()
+		self.config.database_location.save()
 		configfile.save()
 		try:
 			self.scheduleInfo = AutoScheduleTimer.instance.doneConfiguring()
@@ -211,7 +227,7 @@ class RadioTimesEmulatorGUIScreen(ConfigListScreen, Screen):
 	def changedEntry(self):
 		for x in self.onChangedEntry:
 			x()
-		if self["config"].getCurrent() and len(self["config"].getCurrent()) > 1 and self["config"].getCurrent()[1] == config.plugins.RadioTimesEmulator.schedule:
+		if self["config"].getCurrent() and len(self["config"].getCurrent()) > 1 and self["config"].getCurrent()[1] in (self.config.schedule, self.config.schedulewakefromdeep, self.config.schedulestandby):
 			self.createSetup()
 
 	def getCurrentEntry(self):
@@ -233,14 +249,17 @@ class RadioTimesEmulatorGUIScreen(ConfigListScreen, Screen):
 
 	def RadioTimesEmulatorCallback(self, answer=None):
 		print "[RadioTimesEmulatorGUI]answer", answer
-#		self.session.nav.playService(self.session.postScanService)
-#		if answer:
-#			self.close(True)
 		self["description"].setText(_("The download has completed.") + (self.scheduleInfo and " " + _("Next scheduled fetch is programmed for %s.") % self.scheduleInfo + " " or " ") +  _("Please don't forget that after downloading the first time the selected providers will need to be enabled in EPG-Importer plugin."))
 
 	def keySave(self):
 		self.saveAll()
 		self["description"].setText(_("The current configuration has been saved.") + (self.scheduleInfo and " " + _("Next scheduled fetch is programmed for %s.") % self.scheduleInfo + " " or " ") +  _("Please don't forget that after downloading the first time the selected providers will need to be enabled in EPG-Importer plugin."))
+
+	def keyOk(self):
+		if self["config"].getCurrent() and len(self["config"].getCurrent()) > 1 and self["config"].getCurrent()[1] == self.config.dayscreen:
+			self.session.open(RadioTimesEmulatorDaysScreen)
+		else:
+			self.keySave()
 
 	def keyCancel(self):
 		if self["config"].isChanged():
@@ -270,6 +289,50 @@ class RadioTimesEmulatorGUIScreen(ConfigListScreen, Screen):
 		#pass
 
 
+class RadioTimesEmulatorDaysScreen(ConfigListScreen, Screen):
+	def __init__(self, session, args = 0):
+		self.session = session
+		Screen.__init__(self, session)
+		Screen.setTitle(self, _('Radio Times Emulator') + " - " + _("Select days"))
+		self.skinName = ["Setup"]
+		self.config = config.plugins.RadioTimesEmulator
+		self.list = []
+		for i in sorted(self.config.days.keys()):
+			self.list.append(getConfigListEntry(days[i], self.config.days[i]))
+		ConfigListScreen.__init__(self, self.list)
+		self["key_red"] = StaticText(_("Cancel"))
+		self["key_green"] = StaticText(_("Save"))
+		self["setupActions"] = ActionMap(["SetupActions", "ColorActions"],
+		{
+			"red": self.keyCancel,
+			"green": self.keySave,
+			"save": self.keySave,
+			"cancel": self.keyCancel,
+			"ok": self.keySave,
+		}, -2)
+
+	def keySave(self):
+		if not any([self.config.days[i].value for i in self.config.days]):
+			info = self.session.open(MessageBox, _("At least one day of the week must be selected"), MessageBox.TYPE_ERROR, timeout = 30)
+			info.setTitle(_('Radio Times Emulator') + " - " + _("Select days"))
+			return
+		for x in self["config"].list:
+			x[1].save()
+		self.close()
+
+	def keyCancel(self):
+		if self["config"].isChanged():
+			self.session.openWithCallback(self.cancelCallback, MessageBox, _("Really close without saving settings?"))
+		else:
+			self.cancelCallback(True)
+
+	def cancelCallback(self, answer):
+		if answer:
+			for x in self["config"].list:
+				x[1].cancel()
+			self.close(False)
+
+
 def RadioTimesEmulatorGUIStart(menuid, **kwargs):
 	if menuid == "epg_menu" and getImageDistro() in ("teamblue",) or menuid == "epg":
 		return [(_("Radio Times Emulator OpenTV Import"), RadioTimesEmulatorGUIMain, "RadioTimesEmulatorGUIScreen", 1000, True)]
@@ -285,12 +348,16 @@ def RadioTimesEmulatorGUICallback(close, answer):
 	if close and answer:
 		close(True)
 
+def RadioTimesEmulatorWakeupTime():
+	print "[RadioTimesEmulator] next wakeup due %d" % config.plugins.RadioTimesEmulator.nextscheduletime.value
+	return config.plugins.RadioTimesEmulator.nextscheduletime.value > 0 and config.plugins.RadioTimesEmulator.nextscheduletime.value or -1
+
 def Plugins(**kwargs):
 	name = _("Radio Times Emulator OpenTV Downloader")
 	description = _("Creates XML files from OpenTV for use by EPG-Importer plugin")
 	pList = []
 	if pathExists(emulator_path) and any([nimmanager.hasNimType(x) for x in ["DVB-S"]]):
-		pList.append(PluginDescriptor(name="RadioTimesEmulatorSessionStart", where=PluginDescriptor.WHERE_SESSIONSTART, fnc=Scheduleautostart, needsRestart=True))
+		pList.append(PluginDescriptor(name="RadioTimesEmulatorSessionStart", where=[ PluginDescriptor.WHERE_AUTOSTART, PluginDescriptor.WHERE_SESSIONSTART ], fnc=Scheduleautostart, wakeupfnc=RadioTimesEmulatorWakeupTime, needsRestart=True))
 		pList.append(PluginDescriptor(name=name, description=description, where=PluginDescriptor.WHERE_MENU, fnc=RadioTimesEmulatorGUIStart, needsRestart=True) )
 		if getImageDistro() in ("UNKNOWN",):
 			pList.append(PluginDescriptor(name=name, description=description, where=PluginDescriptor.WHERE_PLUGINMENU, fnc=start_from_plugins_menu, needsRestart=True))

@@ -12,7 +12,6 @@ from Components.Sources.FrontendStatus import FrontendStatus
 from Screens.Console import Console
 from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
-from Screens.Standby import inStandby
 
 from Tools.Directories import pathExists
 
@@ -34,6 +33,7 @@ class RadioTimesEmulator(Screen):
 		Screen.__init__(self, session)
 		Screen.setTitle(self, _("Radio Times Emulator Download"))
 
+		from Screens.Standby import inStandby
 		if not inStandby:
 			self["action"] = Label(_("Starting downloader"))
 			self["status"] = Label("")
@@ -50,6 +50,7 @@ class RadioTimesEmulator(Screen):
 		if args:
 			pass
 		self.frontend = None
+		from Screens.Standby import inStandby
 		if not inStandby:
 			self["Frontend"] = FrontendStatus(frontend_source = lambda : self.frontend, update_interval = 100)
 		self.rawchannel = None
@@ -58,7 +59,7 @@ class RadioTimesEmulator(Screen):
 		self.index = 0
 		self.LOCK_TIMEOUT_ROTOR = 1200 	# 100ms for tick - 120 sec
 		self.LOCK_TIMEOUT_FIXED = 50 	# 100ms for tick - 5 sec
-		
+
 		self.LOCK_TIMEOUT = self.LOCK_TIMEOUT_FIXED
 		self.databaseLocation = "%sradiotimes" % config.plugins.RadioTimesEmulator.database_location.value
 		self.providers = Providers().read()
@@ -69,6 +70,7 @@ class RadioTimesEmulator(Screen):
 		if self.postScanService:
 			self.session.nav.playService(self.postScanService)
 			self.postScanService = None
+		from Screens.Standby import inStandby
 		if not inStandby:
 			question = self.session.open(MessageBox, message, MessageBox.TYPE_ERROR)
 			question.setTitle(_("Radio Times Emulator Downloader"))
@@ -88,13 +90,15 @@ class RadioTimesEmulator(Screen):
 			if provider_config.isValid() and Providers().providerFileExists(provider_config.getProvider()):
 				self.actionsList.append(provider_config.getProvider())
 				self.selectedProviders[provider_config.getProvider()] = provider_config
-				
+
 		if len(self.actionsList) > 0:
+			from Screens.Standby import inStandby
 			if not inStandby:
 				self["action"].setText(_('Starting download...'))
 				self["status"].setText("")
 			self.progresscount = len(self.actionsList)* 4 + 2
 			self.progresscurrent = 1
+			from Screens.Standby import inStandby
 			if not inStandby:
 				self["progress_text"].range = self.progresscount
 				self["progress_text"].value = self.progresscurrent
@@ -109,6 +113,7 @@ class RadioTimesEmulator(Screen):
 	def readStreams(self):
 		if self.index < len(self.actionsList): # some providers still need to be read
 			self.transpondercurrent = self.getTransponder(self.providers[self.actionsList[self.index]]["transponder"])
+			from Screens.Standby import inStandby
 			if not inStandby:
 				self["progress_text"].value = self.progresscurrent
 				self["progress"].setValue(self.progresscurrent)
@@ -123,6 +128,7 @@ class RadioTimesEmulator(Screen):
 				self.session.nav.playService(self.postScanService)
 				self.postScanService = None
 			self.progresscurrent += 1
+			from Screens.Standby import inStandby
 			if not inStandby:
 				self["progress_text"].value = self.progresscurrent
 				self["progress"].setValue(self.progresscurrent)
@@ -265,10 +271,11 @@ class RadioTimesEmulator(Screen):
 			print "[RadioTimesEmulator][getFrontend] Fixed dish. Will wait up to %i seconds for tuner lock." % (self.LOCK_TIMEOUT/10)
 
 		self.selectedNIM = current_slotid  # Remember for downloading SI tables
-		
+
+		from Screens.Standby import inStandby
 		if not inStandby:
 			self["tuner_text"].setText(chr(ord('A') + current_slotid))
-		
+
 		self.frontend = self.rawchannel.getFrontend()
 		if not self.frontend:
 			print "[RadioTimesEmulator][getFrontend] Cannot get frontend"
@@ -293,6 +300,7 @@ class RadioTimesEmulator(Screen):
 		self.frontend.tune(params_fe)
 
 		self.progresscurrent += 1
+		from Screens.Standby import inStandby
 		if not inStandby:
 			self["progress_text"].value = self.progresscurrent
 			self["progress"].setValue(self.progresscurrent)
@@ -309,11 +317,13 @@ class RadioTimesEmulator(Screen):
 				print "[RadioTimesEmulator][checkTunerLock] TUNING"
 		elif self.dict["tuner_state"] == "LOCKED":
 			print "[RadioTimesEmulator][checkTunerLock] TUNER LOCKED"
+			from Screens.Standby import inStandby
 			if not inStandby:
 				self["action"].setText(_("Reading EPG from %s MHz") % (str(self.transpondercurrent.frequency/1000)))
 				#self["status"].setText(_("???"))
 
 			self.progresscurrent += 1
+			from Screens.Standby import inStandby
 			if not inStandby:
 				self["progress_text"].value = self.progresscurrent
 				self["progress"].setValue(self.progresscurrent)
@@ -337,15 +347,16 @@ class RadioTimesEmulator(Screen):
 		command = self.RadioTimesEmulatorCommand()
 		print "[RadioTimesEmulator] command:", command
 		self.session.openWithCallback(
-			self.readTransponderCallback, 
-			RadioTimesEmulatorDisplayOutput, 
+			self.readTransponderCallback,
+			RadioTimesEmulatorDisplayOutput,
 			_("Radio Times Emulator - Downloading %s") % self.providers[self.actionsList[self.index]]["name"], # this shows as the cosole title if you use the default console screen as the display.
-			[command], 
+			[command],
 			closeOnSuccess = True,
 			prefix = "%s: " % self.providers[self.actionsList[self.index]]["name"])
 
 	def readTransponderCallback(self):
 		self.progresscurrent += 1
+		from Screens.Standby import inStandby
 		if not inStandby:
 			self["progress_text"].value = self.progresscurrent
 			self["progress"].setValue(self.progresscurrent)
@@ -361,12 +372,13 @@ class RadioTimesEmulator(Screen):
 			except IOError:
 				print "[RadioTimesEmulator] failed to copy %s to %s" % (src_filename, dest_filename)
 		self.progresscurrent += 1
+		from Screens.Standby import inStandby
 		if not inStandby:
 			self["progress_text"].value = self.progresscurrent
 			self["progress"].setValue(self.progresscurrent)
 		self.index += 1
 		self.readStreams()
-		
+
 # Usage:
 #   ./radiotimes_emulator [options]
 # Options:
@@ -415,10 +427,12 @@ class RadioTimesEmulatorDisplayOutput(Console):
 	def __init__(self, session, title = "Console", cmdlist = None, finishedCallback = None, closeOnSuccess = False, prefix = ""):
 		Console.__init__(self, session, title, cmdlist, finishedCallback, closeOnSuccess)
 		self.prefix = prefix
+		from Screens.Standby import inStandby
 		if not inStandby:
 			self["actionLong"] = Label("")
 
 	def dataAvail(self, str):
+		from Screens.Standby import inStandby
 		if not inStandby:
 #			self["text"].appendText(str) # Appending to this variable crashes OpenATV (ScrollLabel.py) if the variable is not used in the skin
 			str_no_date = re.sub(r'[0-9]+\/[0-9]+\/[0-9]+\s[0-9]+[:][0-9]+[:][0-9]+', '', str).strip()

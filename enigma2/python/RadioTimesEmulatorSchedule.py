@@ -1,7 +1,6 @@
-from Components.config import config
+from Components.config import config, configfile
 
 from Screens.MessageBox import MessageBox
-from Screens.Standby import inStandby
 
 from enigma import eTimer
 
@@ -11,19 +10,44 @@ from time import localtime, time, strftime, mktime
 
 autoScheduleTimer = None
 def Scheduleautostart(reason, session=None, **kwargs):
-	"called with reason=1 to during /sbin/shutdown.sysvinit, with reason=0 at startup?"
+	#
+	# This gets called twice at start up,once by WHERE_AUTOSTART without session,
+	# and once by WHERE_SESSIONSTART with session. WHERE_AUTOSTART is needed though
+	# as it is used to wake from deep standby. We need to read from session so if
+	# session is not set just return and wait for the second call to this function.
+	#
+	# Called with reason=1 during /sbin/shutdown.sysvinit, and with reason=0 at startup.
+	# Called with reason=1 only happens when using WHERE_AUTOSTART.
+	# If only using WHERE_SESSIONSTART there is no call to this function on shutdown.
+	#
+	print "[RadioTimesEmulator][Scheduleautostart] reason(%d), session" % reason, session
+	if reason == 0 and session is None:
+		return
 	global autoScheduleTimer
-	global _session
+	global wasScheduleTimerWakeup
+	wasScheduleTimerWakeup = False
 	now = int(time())
 	if reason == 0:
+		if config.plugins.RadioTimesEmulator.schedule.value:
+			# check if box was woken up by a timer, if so, check if this plugin set this timer. This is not conclusive.
+			if session.nav.wasTimerWakeup() and abs(config.plugins.RadioTimesEmulator.nextscheduletime.value - time()) <= 360:
+				wasScheduleTimerWakeup = True
+				# if box is not in standby do it now
+				from Screens.Standby import inStandby
+				if config.plugins.RadioTimesEmulator.schedulestandby.value and not inStandby:
+					# hack alert: session requires "pipshown" to avoid a crash in standby.py
+					if not hasattr(session, "pipshown"):
+						session.pipshown = False
+					from Tools import Notifications
+					Notifications.AddNotificationWithID("Standby", Standby)
+
 		print "[RadioTimesEmulator][Scheduleautostart] AutoStart Enabled"
-		if session is not None:
-			_session = session
-			if autoScheduleTimer is None:
-				autoScheduleTimer = AutoScheduleTimer(session)
+		if autoScheduleTimer is None:
+			autoScheduleTimer = AutoScheduleTimer(session)
 	else:
 		print "[RadioTimesEmulator][Scheduleautostart] Stop"
-		autoScheduleTimer.stop()
+		if autoScheduleTimer is not None:
+			autoScheduleTimer.schedulestop()
 
 class AutoScheduleTimer:
 	instance = None
@@ -36,18 +60,16 @@ class AutoScheduleTimer:
 		self.scheduletimer.callback.append(self.ScheduleonTimer)
 		self.scheduleactivityTimer = eTimer()
 		self.scheduleactivityTimer.timeout.get().append(self.scheduledatedelay)
+		self.ScheduleTime = 0
 		now = int(time())
-		global ScheduleTime
 		if self.config.schedule.value:
 			print "[%s][AutoScheduleTimer] Schedule Enabled at " % self.schedulename, strftime("%c", localtime(now))
-			if now > 1262304000:
+			if now > 1546300800: # Tuesday, January 1, 2019 12:00:00 AM
 				self.scheduledate()
 			else:
-				print "[%s][AutoScheduleTimer] Time not yet set." % self.schedulename
-				ScheduleTime = 0
+				print "[%s][AutoScheduleTimer] STB clock not yet set." % self.schedulename
 				self.scheduleactivityTimer.start(36000)
 		else:
-			ScheduleTime = 0
 			print "[%s][AutoScheduleTimer] Schedule Disabled at" % self.schedulename, strftime("%c", localtime(now))
 			self.scheduleactivityTimer.stop()
 
@@ -62,40 +84,36 @@ class AutoScheduleTimer:
 		self.scheduledate()
 
 	def getScheduleTime(self):
-		scheduleclock = self.config.scheduletime.value
-		nowt = time()
-		now = localtime(nowt)
-		return int(mktime((now.tm_year, now.tm_mon, now.tm_mday, scheduleclock[0], scheduleclock[1], 0, now.tm_wday, now.tm_yday, now.tm_isdst)))
+		now = localtime(time())
+		return int(mktime((now.tm_year, now.tm_mon, now.tm_mday, self.config.scheduletime.value[0], self.config.scheduletime.value[1], 0, now.tm_wday, now.tm_yday, now.tm_isdst)))
+
+	def getScheduleDayOfWeek(self):
+		today = self.getToday()
+		for i in range(1, 8):
+			if self.config.days[(today+i)%7].value:
+				return i
+
+	def getToday(self):
+		return localtime(time()).tm_wday
 
 	def scheduledate(self, atLeast = 0):
 		self.scheduletimer.stop()
-		global ScheduleTime
-		ScheduleTime = self.getScheduleTime()
+		self.ScheduleTime = self.getScheduleTime()
 		now = int(time())
-		if ScheduleTime > 0:
-			if ScheduleTime < now + atLeast:
-				if self.config.repeattype.value == "daily":
-					ScheduleTime += 24*3600
-					while (int(ScheduleTime)-30) < now:
-						ScheduleTime += 24*3600
-				elif self.config.repeattype.value == "every 3 days":
-					ScheduleTime += 3*24*3600
-					while (int(ScheduleTime)-30) < now:
-						ScheduleTime += 3*24*3600
-				elif self.config.repeattype.value == "weekly":
-					ScheduleTime += 7*24*3600
-					while (int(ScheduleTime)-30) < now:
-						ScheduleTime += 7*24*3600
-#				elif self.config.repeattype.value == "monthly":
-#					ScheduleTime += 30*24*3600
-#					while (int(ScheduleTime)-30) < now:
-#						ScheduleTime += 30*24*3600
-			next = ScheduleTime - now
+		if self.ScheduleTime > 0:
+			if self.ScheduleTime < now + atLeast:
+				self.ScheduleTime += 86400*self.getScheduleDayOfWeek()
+			elif not self.config.days[self.getToday()].value:
+				self.ScheduleTime += 86400*self.getScheduleDayOfWeek()
+			next = self.ScheduleTime - now
 			self.scheduletimer.startLongTimer(next)
 		else:
-			ScheduleTime = -1
-		print "[%s][scheduledate] Time set to" % self.schedulename, strftime("%c", localtime(ScheduleTime)), strftime("(now=%c)", localtime(now))
-		return ScheduleTime
+			self.ScheduleTime = -1
+		print "[%s][scheduledate] Time set to" % self.schedulename, strftime("%c", localtime(self.ScheduleTime)), strftime("(now=%c)", localtime(now))
+		self.config.nextscheduletime.value = self.ScheduleTime
+		self.config.nextscheduletime.save()
+		configfile.save()
+		return self.ScheduleTime
 
 	def schedulestop(self):
 		self.scheduletimer.stop()
@@ -104,7 +122,6 @@ class AutoScheduleTimer:
 		self.scheduletimer.stop()
 		now = int(time())
 		wake = self.getScheduleTime()
-		# If we're close enough, we're okay...
 		atLeast = 0
 		if wake - now < 60:
 			atLeast = 60
@@ -123,11 +140,9 @@ class AutoScheduleTimer:
 		if answer is False:
 			if self.config.retrycount.value < 2:
 				print "[%s][doSchedule] Schedule delayed." % self.schedulename
-				repeat = self.config.retrycount.value
-				repeat += 1
-				self.config.retrycount.value = repeat
-				ScheduleTime = now + (int(self.config.retry.value) * 60)
-				print "[%s][doSchedule] Time now set to" % self.schedulename, strftime("%c", localtime(ScheduleTime)), strftime("(now=%c)", localtime(now))
+				self.config.retrycount.value += 1
+				self.ScheduleTime = now + (int(self.config.retry.value) * 60)
+				print "[%s][doSchedule] Time now set to" % self.schedulename, strftime("%c", localtime(self.ScheduleTime)), strftime("(now=%c)", localtime(now))
 				self.scheduletimer.startLongTimer(int(self.config.retry.value) * 60)
 			else:
 				atLeast = 60
@@ -137,12 +152,19 @@ class AutoScheduleTimer:
 				self.scheduledate(atLeast)
 		else:
 			self.timer = eTimer()
-			self.timer.callback.append(self.doautostartscan)
+			self.timer.callback.append(self.runscheduleditem)
 			print "[%s][doSchedule] Running Schedule" % self.schedulename, strftime("%c", localtime(now))
 			self.timer.start(100, 1)
 
-	def doautostartscan(self):
-		self.session.open(self.itemtorun)
+	def runscheduleditem(self):
+		self.session.openWithCallback(self.runscheduleditemCallback, self.itemtorun)
+
+	def runscheduleditemCallback(self):
+		from Screens.Standby import Standby, inStandby, TryQuitMainloop, inTryQuitMainloop
+		print "[%s][runscheduleditemCallback] inStandby" % self.schedulename, inStandby
+		if self.config.schedule.value and wasScheduleTimerWakeup and self.config.schedulestandby.value and inStandby and self.config.scheduleshutdown.value and not self.session.nav.getRecordings() and not inTryQuitMainloop:
+			print "[%s] Returning to deep standby after scheduled wakeup" % self.schedulename
+			self.session.open(TryQuitMainloop, 1)
 
 	def doneConfiguring(self): # called from plugin on save
 		now = int(time())
@@ -152,13 +174,12 @@ class AutoScheduleTimer:
 				autoScheduleTimer.scheduledate()
 		else:
 			if autoScheduleTimer is not None:
-				global ScheduleTime
-				ScheduleTime = 0
+				self.ScheduleTime = 0
 				print "[%s][doneConfiguring] Schedule Disabled at" % self.schedulename, strftime("%c", localtime(now))
 				autoScheduleTimer.schedulestop()
 		# scheduletext is not used for anything but could be returned to the calling function to display in the GUI.
-		if ScheduleTime > 0:
-			t = localtime(ScheduleTime)
+		if self.ScheduleTime > 0:
+			t = localtime(self.ScheduleTime)
 			scheduletext = strftime(_("%a %e %b  %-H:%M"), t)
 		else:
 			scheduletext = ""
