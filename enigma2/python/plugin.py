@@ -55,7 +55,6 @@ config.plugins.RadioTimesEmulator.schedule = ConfigYesNo(default = False)
 config.plugins.RadioTimesEmulator.scheduletime = ConfigClock(default = 0) # 1:00
 config.plugins.RadioTimesEmulator.nextscheduletime = ConfigNumber(default = 0)
 config.plugins.RadioTimesEmulator.schedulewakefromdeep = ConfigYesNo(default = True)
-config.plugins.RadioTimesEmulator.schedulestandby = ConfigYesNo(default = True)
 config.plugins.RadioTimesEmulator.scheduleshutdown = ConfigYesNo(default = True)
 config.plugins.RadioTimesEmulator.dayscreen = ConfigSelection(choices = [("1", _("Press OK"))], default = "1")
 config.plugins.RadioTimesEmulator.retry = ConfigNumber(default = 30)
@@ -190,9 +189,7 @@ class RadioTimesEmulatorGUIScreen(ConfigListScreen, Screen):
 			self.list.append(getConfigListEntry(indent + _("Schedule days of the week"), self.config.dayscreen, _("Press OK to select which days to fetch the EPG.")))
 			self.list.append(getConfigListEntry(indent + _("Schedule wake from deep standby"), self.config.schedulewakefromdeep, _("If the receiver is in 'Deep Standby' when the schedule is due wake it up to fetch the EPG.")))
 			if self.config.schedulewakefromdeep.value:
-				self.list.append(getConfigListEntry(indent + _("Schedule boot to standby"), self.config.schedulestandby, _("Boot to 'Standby'. Doing this confirms it is unlikeky someone is using the receiver.")))
-				if self.config.schedulestandby.value:
-					self.list.append(getConfigListEntry(indent + _("Schedule return to deep standby"), self.config.scheduleshutdown, _("If the receiver was woken from 'Deep Standby' and is currently in 'Standby' and no recordings are in progress return it to 'Deep Standby' once the import has completed.")))
+				self.list.append(getConfigListEntry(indent + _("Schedule return to deep standby"), self.config.scheduleshutdown, _("If the receiver was woken from 'Deep Standby' and is currently in 'Standby' and no recordings are in progress return it to 'Deep Standby' once the import has completed.")))
 
 		self["config"].list = self.list
 		self["config"].l.setList(self.list)
@@ -227,7 +224,7 @@ class RadioTimesEmulatorGUIScreen(ConfigListScreen, Screen):
 	def changedEntry(self):
 		for x in self.onChangedEntry:
 			x()
-		if self["config"].getCurrent() and len(self["config"].getCurrent()) > 1 and self["config"].getCurrent()[1] in (self.config.schedule, self.config.schedulewakefromdeep, self.config.schedulestandby):
+		if self["config"].getCurrent() and len(self["config"].getCurrent()) > 1 and self["config"].getCurrent()[1] in (self.config.schedule, self.config.schedulewakefromdeep):
 			self.createSetup()
 
 	def getCurrentEntry(self):

@@ -33,8 +33,8 @@ def Scheduleautostart(reason, session=None, **kwargs):
 			if session.nav.wasTimerWakeup() and abs(config.plugins.RadioTimesEmulator.nextscheduletime.value - time()) <= 360:
 				wasScheduleTimerWakeup = True
 				# if box is not in standby do it now
-				from Screens.Standby import inStandby
-				if config.plugins.RadioTimesEmulator.schedulestandby.value and not inStandby:
+				from Screens.Standby import Standby, inStandby
+				if not inStandby:
 					# hack alert: session requires "pipshown" to avoid a crash in standby.py
 					if not hasattr(session, "pipshown"):
 						session.pipshown = False
@@ -162,7 +162,7 @@ class AutoScheduleTimer:
 	def runscheduleditemCallback(self):
 		from Screens.Standby import Standby, inStandby, TryQuitMainloop, inTryQuitMainloop
 		print "[%s][runscheduleditemCallback] inStandby" % self.schedulename, inStandby
-		if self.config.schedule.value and wasScheduleTimerWakeup and self.config.schedulestandby.value and inStandby and self.config.scheduleshutdown.value and not self.session.nav.getRecordings() and not inTryQuitMainloop:
+		if self.config.schedule.value and wasScheduleTimerWakeup and inStandby and self.config.scheduleshutdown.value and not self.session.nav.getRecordings() and not inTryQuitMainloop:
 			print "[%s] Returning to deep standby after scheduled wakeup" % self.schedulename
 			self.session.open(TryQuitMainloop, 1)
 
