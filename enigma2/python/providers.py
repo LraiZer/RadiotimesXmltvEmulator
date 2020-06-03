@@ -1,3 +1,4 @@
+from __future__ import print_function
 from Tools.Directories import crawlDirectory, fileExists
 
 import re
@@ -18,7 +19,7 @@ class Providers():
 			f.close()
 			return conf
 		except:
-			print "[RadioTimesEmulatorGUI][providers] could not open %s" % filename
+			print("[RadioTimesEmulatorGUI][providers] could not open %s" % filename)
 
 	def getName(self, lines):
 		name_pattern = re.compile(r"description=(.+)")

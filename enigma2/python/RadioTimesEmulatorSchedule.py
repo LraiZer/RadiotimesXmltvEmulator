@@ -1,10 +1,12 @@
+from __future__ import print_function
+from __future__ import absolute_import
 from Components.config import config, configfile
 
 from Screens.MessageBox import MessageBox
 
 from enigma import eTimer
 
-from RadioTimesEmulator import RadioTimesEmulator
+from .RadioTimesEmulator import RadioTimesEmulator
 
 from time import localtime, time, strftime, mktime
 
@@ -20,7 +22,7 @@ def Scheduleautostart(reason, session=None, **kwargs):
 	# Called with reason=1 only happens when using WHERE_AUTOSTART.
 	# If only using WHERE_SESSIONSTART there is no call to this function on shutdown.
 	#
-	print "[RadioTimesEmulator][Scheduleautostart] reason(%d), session" % reason, session
+	print("[RadioTimesEmulator][Scheduleautostart] reason(%d), session" % reason, session)
 	if reason == 0 and session is None:
 		return
 	global autoScheduleTimer
@@ -41,11 +43,11 @@ def Scheduleautostart(reason, session=None, **kwargs):
 					from Tools import Notifications
 					Notifications.AddNotificationWithID("Standby", Standby)
 
-		print "[RadioTimesEmulator][Scheduleautostart] AutoStart Enabled"
+		print("[RadioTimesEmulator][Scheduleautostart] AutoStart Enabled")
 		if autoScheduleTimer is None:
 			autoScheduleTimer = AutoScheduleTimer(session)
 	else:
-		print "[RadioTimesEmulator][Scheduleautostart] Stop"
+		print("[RadioTimesEmulator][Scheduleautostart] Stop")
 		if autoScheduleTimer is not None:
 			autoScheduleTimer.schedulestop()
 
@@ -63,14 +65,14 @@ class AutoScheduleTimer:
 		self.ScheduleTime = 0
 		now = int(time())
 		if self.config.schedule.value:
-			print "[%s][AutoScheduleTimer] Schedule Enabled at " % self.schedulename, strftime("%c", localtime(now))
+			print("[%s][AutoScheduleTimer] Schedule Enabled at " % self.schedulename, strftime("%c", localtime(now)))
 			if now > 1546300800: # Tuesday, January 1, 2019 12:00:00 AM
 				self.scheduledate()
 			else:
-				print "[%s][AutoScheduleTimer] STB clock not yet set." % self.schedulename
+				print("[%s][AutoScheduleTimer] STB clock not yet set." % self.schedulename)
 				self.scheduleactivityTimer.start(36000)
 		else:
-			print "[%s][AutoScheduleTimer] Schedule Disabled at" % self.schedulename, strftime("%c", localtime(now))
+			print("[%s][AutoScheduleTimer] Schedule Disabled at" % self.schedulename, strftime("%c", localtime(now)))
 			self.scheduleactivityTimer.stop()
 
 		assert AutoScheduleTimer.instance is None, "class AutoScheduleTimer is a singleton class and just one instance of this class is allowed!"
@@ -109,7 +111,7 @@ class AutoScheduleTimer:
 			self.scheduletimer.startLongTimer(next)
 		else:
 			self.ScheduleTime = -1
-		print "[%s][scheduledate] Time set to" % self.schedulename, strftime("%c", localtime(self.ScheduleTime)), strftime("(now=%c)", localtime(now))
+		print("[%s][scheduledate] Time set to" % self.schedulename, strftime("%c", localtime(self.ScheduleTime)), strftime("(now=%c)", localtime(now)))
 		self.config.nextscheduletime.value = self.ScheduleTime
 		self.config.nextscheduletime.save()
 		configfile.save()
@@ -125,7 +127,7 @@ class AutoScheduleTimer:
 		atLeast = 0
 		if wake - now < 60:
 			atLeast = 60
-			print "[%s][ScheduleonTimer] onTimer occured at" % self.schedulename, strftime("%c", localtime(now))
+			print("[%s][ScheduleonTimer] onTimer occured at" % self.schedulename, strftime("%c", localtime(now)))
 			from Screens.Standby import inStandby
 			if not inStandby:
 				message = _("%s update is about to start.\nDo you want to allow this?") % self.schedulename
@@ -139,21 +141,21 @@ class AutoScheduleTimer:
 		now = int(time())
 		if answer is False:
 			if self.config.retrycount.value < 2:
-				print "[%s][doSchedule] Schedule delayed." % self.schedulename
+				print("[%s][doSchedule] Schedule delayed." % self.schedulename)
 				self.config.retrycount.value += 1
 				self.ScheduleTime = now + (int(self.config.retry.value) * 60)
-				print "[%s][doSchedule] Time now set to" % self.schedulename, strftime("%c", localtime(self.ScheduleTime)), strftime("(now=%c)", localtime(now))
+				print("[%s][doSchedule] Time now set to" % self.schedulename, strftime("%c", localtime(self.ScheduleTime)), strftime("(now=%c)", localtime(now)))
 				self.scheduletimer.startLongTimer(int(self.config.retry.value) * 60)
 			else:
 				atLeast = 60
-				print "[%s][doSchedule] Enough Retries, delaying till next schedule." % self.schedulename, strftime("%c", localtime(now))
+				print("[%s][doSchedule] Enough Retries, delaying till next schedule." % self.schedulename, strftime("%c", localtime(now)))
 				self.session.open(MessageBox, _("Enough Retries, delaying till next schedule."), MessageBox.TYPE_INFO, timeout = 10)
 				self.config.retrycount.value = 0
 				self.scheduledate(atLeast)
 		else:
 			self.timer = eTimer()
 			self.timer.callback.append(self.runscheduleditem)
-			print "[%s][doSchedule] Running Schedule" % self.schedulename, strftime("%c", localtime(now))
+			print("[%s][doSchedule] Running Schedule" % self.schedulename, strftime("%c", localtime(now)))
 			self.timer.start(100, 1)
 
 	def runscheduleditem(self):
@@ -161,21 +163,21 @@ class AutoScheduleTimer:
 
 	def runscheduleditemCallback(self):
 		from Screens.Standby import Standby, inStandby, TryQuitMainloop, inTryQuitMainloop
-		print "[%s][runscheduleditemCallback] inStandby" % self.schedulename, inStandby
+		print("[%s][runscheduleditemCallback] inStandby" % self.schedulename, inStandby)
 		if self.config.schedule.value and wasScheduleTimerWakeup and inStandby and self.config.scheduleshutdown.value and not self.session.nav.getRecordings() and not inTryQuitMainloop:
-			print "[%s] Returning to deep standby after scheduled wakeup" % self.schedulename
+			print("[%s] Returning to deep standby after scheduled wakeup" % self.schedulename)
 			self.session.open(TryQuitMainloop, 1)
 
 	def doneConfiguring(self): # called from plugin on save
 		now = int(time())
 		if self.config.schedule.value:
 			if autoScheduleTimer is not None:
-				print "[%s][doneConfiguring] Schedule Enabled at" % self.schedulename, strftime("%c", localtime(now))
+				print("[%s][doneConfiguring] Schedule Enabled at" % self.schedulename, strftime("%c", localtime(now)))
 				autoScheduleTimer.scheduledate()
 		else:
 			if autoScheduleTimer is not None:
 				self.ScheduleTime = 0
-				print "[%s][doneConfiguring] Schedule Disabled at" % self.schedulename, strftime("%c", localtime(now))
+				print("[%s][doneConfiguring] Schedule Disabled at" % self.schedulename, strftime("%c", localtime(now)))
 				autoScheduleTimer.schedulestop()
 		# scheduletext is not used for anything but could be returned to the calling function to display in the GUI.
 		if self.ScheduleTime > 0:

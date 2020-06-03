@@ -1,3 +1,5 @@
+from __future__ import print_function
+from __future__ import absolute_import
 # for localized messages
 from . import _
 
@@ -17,18 +19,18 @@ from Tools.Directories import pathExists
 
 from enigma import eDVBResourceManager, eTimer, eDVBFrontendParameters, eDVBFrontendParametersSatellite
 
-from providers import Providers, emulator_path, epg_import_sources_path, ProviderConfig
+from .providers import Providers, emulator_path, epg_import_sources_path, ProviderConfig
 
 import re
 
-from RadioTimesEmulatorSkin import downloadBar
+from .RadioTimesEmulatorSkin import downloadBar
 
 class RadioTimesEmulator(Screen):
 	skin = downloadBar
 
 	def __init__(self, session, args = 0):
-		print "[RadioTimesEmulator][__init__] Starting..."
-		print "[RadioTimesEmulator][__init__] args", args
+		print("[RadioTimesEmulator][__init__] Starting...")
+		print("[RadioTimesEmulator][__init__] args", args)
 		self.session = session
 		Screen.__init__(self, session)
 		Screen.setTitle(self, _("Radio Times Emulator Download"))
@@ -168,7 +170,7 @@ class RadioTimesEmulator(Screen):
 		return False
 
 	def getFrontend(self):
-		print "[RadioTimesEmulator][getFrontend] searching for available tuner"
+		print("[RadioTimesEmulator][getFrontend] searching for available tuner")
 		nimList = []
 		for nim in nimmanager.nim_slots:
 			if not nim.isCompatible("DVB-S") or \
@@ -179,13 +181,13 @@ class RadioTimesEmulator(Screen):
 			nimList.append(nim.slot)
 
 		if len(nimList) == 0:
-			print "[RadioTimesEmulator][getFrontend] No compatible tuner found"
+			print("[RadioTimesEmulator][getFrontend] No compatible tuner found")
 			self.showError(_('No compatible tuner found'))
 			return
 
 		resmanager = eDVBResourceManager.getInstance()
 		if not resmanager:
-			print "[RadioTimesEmulator][getFrontend] Cannot retrieve Resource Manager instance"
+			print("[RadioTimesEmulator][getFrontend] Cannot retrieve Resource Manager instance")
 			self.showError(_('Cannot retrieve Resource Manager instance'))
 			return
 
@@ -193,7 +195,7 @@ class RadioTimesEmulator(Screen):
 		if self.session.pipshown:
 			self.session.pipshown = False
 			del self.session.pip
-			print "[RadioTimesEmulator][getFrontend] Stopping PIP."
+			print("[RadioTimesEmulator][getFrontend] Stopping PIP.")
 
 		# stop currently playing service if it is using a tuner in ("loopthrough", "satposdepends")
 		currentlyPlayingNIM = None
@@ -208,7 +210,7 @@ class RadioTimesEmulator(Screen):
 					self.postScanService = self.session.nav.getCurrentlyPlayingServiceReference()
 					self.session.nav.stopService()
 					currentlyPlayingNIM = None
-					print "[RadioTimesEmulator][getFrontend] The active service was using a %s tuner, so had to be stopped (slot id %s)." % (nimConfigMode, currentlyPlayingNIM)
+					print("[RadioTimesEmulator][getFrontend] The active service was using a %s tuner, so had to be stopped (slot id %s)." % (nimConfigMode, currentlyPlayingNIM))
 		del frontendInfo
 		del currentService
 
@@ -226,7 +228,7 @@ class RadioTimesEmulator(Screen):
 
 			self.rawchannel = resmanager.allocateRawChannel(slotid)
 			if self.rawchannel:
-				print "[RadioTimesEmulator][getFrontend] Nim found on slot id %d with sat %s" % (slotid, nimmanager.getSatName(self.transpondercurrent.orbital_position))
+				print("[RadioTimesEmulator][getFrontend] Nim found on slot id %d with sat %s" % (slotid, nimmanager.getSatName(self.transpondercurrent.orbital_position)))
 				current_slotid = slotid
 				break
 
@@ -234,7 +236,7 @@ class RadioTimesEmulator(Screen):
 				break
 
 		if current_slotid == -1:
-			print "[RadioTimesEmulator][getFrontend] No valid NIM found"
+			print("[RadioTimesEmulator][getFrontend] No valid NIM found")
 			self.showError(_('No valid NIM found for %s') % PROVIDERS[config.plugins.RadioTimesEmulator.provider.value]["name"])
 			return
 
@@ -242,21 +244,21 @@ class RadioTimesEmulator(Screen):
 			# if we are here the only possible option is to close the active service
 			if currentlyPlayingNIM in nimList:
 				slotid = currentlyPlayingNIM
-				print "[RadioTimesEmulator][getFrontend] Nim found on slot id %d but it's busy. Stopping active service" % slotid
+				print("[RadioTimesEmulator][getFrontend] Nim found on slot id %d but it's busy. Stopping active service" % slotid)
 				self.postScanService = self.session.nav.getCurrentlyPlayingServiceReference()
 				self.session.nav.stopService()
 				self.rawchannel = resmanager.allocateRawChannel(slotid)
 				if self.rawchannel:
-					print "[RadioTimesEmulator][getFrontend] The active service was stopped, and the NIM is now free to use."
+					print("[RadioTimesEmulator][getFrontend] The active service was stopped, and the NIM is now free to use.")
 					current_slotid = slotid
 
 			if not self.rawchannel:
 				if self.session.nav.RecordTimer.isRecording():
-					print "[RadioTimesEmulator][getFrontend] Cannot free NIM because a recording is in progress"
+					print("[RadioTimesEmulator][getFrontend] Cannot free NIM because a recording is in progress")
 					self.showError(_('Cannot free NIM because a recording is in progress'))
 					return
 				else:
-					print "[RadioTimesEmulator][getFrontend] Cannot get the NIM"
+					print("[RadioTimesEmulator][getFrontend] Cannot get the NIM")
 					self.showError(_('Cannot get the NIM'))
 					return
 
@@ -265,10 +267,10 @@ class RadioTimesEmulator(Screen):
 		if self.isRotorSat(current_slotid, self.transpondercurrent.orbital_position):
 			self.motorised = True
 			self.LOCK_TIMEOUT = self.LOCK_TIMEOUT_ROTOR
-			print "[RadioTimesEmulator][getFrontend] Motorised dish. Will wait up to %i seconds for tuner lock." % (self.LOCK_TIMEOUT/10)
+			print("[RadioTimesEmulator][getFrontend] Motorised dish. Will wait up to %i seconds for tuner lock." % (self.LOCK_TIMEOUT/10))
 		else:
 			self.LOCK_TIMEOUT = self.LOCK_TIMEOUT_FIXED
-			print "[RadioTimesEmulator][getFrontend] Fixed dish. Will wait up to %i seconds for tuner lock." % (self.LOCK_TIMEOUT/10)
+			print("[RadioTimesEmulator][getFrontend] Fixed dish. Will wait up to %i seconds for tuner lock." % (self.LOCK_TIMEOUT/10))
 
 		self.selectedNIM = current_slotid  # Remember for downloading SI tables
 
@@ -278,13 +280,13 @@ class RadioTimesEmulator(Screen):
 
 		self.frontend = self.rawchannel.getFrontend()
 		if not self.frontend:
-			print "[RadioTimesEmulator][getFrontend] Cannot get frontend"
+			print("[RadioTimesEmulator][getFrontend] Cannot get frontend")
 			self.showError(_('Cannot get frontend'))
 			return
 
 		self.demuxer_id = self.rawchannel.reserveDemux()
 		if self.demuxer_id < 0:
-			print "[RadioTimesEmulator][doTune] Cannot allocate the demuxer."
+			print("[RadioTimesEmulator][doTune] Cannot allocate the demuxer.")
 			self.showError(_('Cannot allocate the demuxer.'))
 			return
 
@@ -314,9 +316,9 @@ class RadioTimesEmulator(Screen):
 		self.frontend.getFrontendStatus(self.dict)
 		if self.dict["tuner_state"] == "TUNING":
 			if self.lockcounter < 1: # only show this once in the log per retune event
-				print "[RadioTimesEmulator][checkTunerLock] TUNING"
+				print("[RadioTimesEmulator][checkTunerLock] TUNING")
 		elif self.dict["tuner_state"] == "LOCKED":
-			print "[RadioTimesEmulator][checkTunerLock] TUNER LOCKED"
+			print("[RadioTimesEmulator][checkTunerLock] TUNER LOCKED")
 			from Screens.Standby import inStandby
 			if not inStandby:
 				self["action"].setText(_("Reading EPG from %s MHz") % (str(self.transpondercurrent.frequency/1000)))
@@ -332,20 +334,20 @@ class RadioTimesEmulator(Screen):
 			self.readTranspondertimer.start(1000, 1)
 			return
 		elif self.dict["tuner_state"] in ("LOSTLOCK", "FAILED"):
-			print "[RadioTimesEmulator][checkTunerLock] TUNING FAILED"
+			print("[RadioTimesEmulator][checkTunerLock] TUNING FAILED")
 			self.showError(_('Tune failure. Provider %s. %s MHz. Tuner %s') % (self.providers[self.actionsList[self.index]]["name"], str(self.transpondercurrent.frequency/1000), chr(ord('A') + self.selectedNIM)))
 			return
 
 		self.lockcounter += 1
 		if self.lockcounter > self.LOCK_TIMEOUT:
-			print "[RadioTimesEmulator][checkTunerLock] Timeout for tuner lock"
+			print("[RadioTimesEmulator][checkTunerLock] Timeout for tuner lock")
 			self.showError(_('Tuner lock timeout. Provider %s. %s MHz. Tuner %s') % (self.providers[self.actionsList[self.index]]["name"], str(self.transpondercurrent.frequency/1000), chr(ord('A') + self.selectedNIM)))
 			return
 		self.locktimer.start(100, 1)
 
 	def readTransponder(self):
 		command = self.RadioTimesEmulatorCommand()
-		print "[RadioTimesEmulator] command:", command
+		print("[RadioTimesEmulator] command:", command)
 		self.session.openWithCallback(
 			self.readTransponderCallback,
 			RadioTimesEmulatorDisplayOutput,
@@ -370,7 +372,7 @@ class RadioTimesEmulator(Screen):
 				 		d.close()
 				 	s.close()
 			except IOError:
-				print "[RadioTimesEmulator] failed to copy %s to %s" % (src_filename, dest_filename)
+				print("[RadioTimesEmulator] failed to copy %s to %s" % (src_filename, dest_filename))
 		self.progresscurrent += 1
 		from Screens.Standby import inStandby
 		if not inStandby:

@@ -1,3 +1,5 @@
+from __future__ import print_function
+from __future__ import absolute_import
 # for localized messages
 from . import _
 
@@ -26,10 +28,10 @@ except:
 		return "UNKNOWN"
 
 # from this plugin
-from providers import Providers, emulator_path, epg_import_sources_path, ProviderConfig
-from RadioTimesEmulator import RadioTimesEmulator
-from RadioTimesEmulatorSchedule import AutoScheduleTimer, Scheduleautostart
-from about import RadioTimesEmulatorAbout
+from .providers import Providers, emulator_path, epg_import_sources_path, ProviderConfig
+from .RadioTimesEmulator import RadioTimesEmulator
+from .RadioTimesEmulatorSchedule import AutoScheduleTimer, Scheduleautostart
+from .about import RadioTimesEmulatorAbout
 
 paths = []
 default_path = ""
@@ -214,7 +216,7 @@ class RadioTimesEmulatorGUIScreen(ConfigListScreen, Screen):
 		try:
 			self.scheduleInfo = AutoScheduleTimer.instance.doneConfiguring()
 		except AttributeError as e:
-			print "[RadioTimesEmulator] Timer.instance not available for reconfigure.", e
+			print("[RadioTimesEmulator] Timer.instance not available for reconfigure.", e)
 			self.scheduleInfo = ""
 
 	def selectionChanged(self):
@@ -245,7 +247,7 @@ class RadioTimesEmulatorGUIScreen(ConfigListScreen, Screen):
 		self.session.openWithCallback(self.RadioTimesEmulatorCallback, RadioTimesEmulator, {})
 
 	def RadioTimesEmulatorCallback(self, answer=None):
-		print "[RadioTimesEmulatorGUI]answer", answer
+		print("[RadioTimesEmulatorGUI]answer", answer)
 		self["description"].setText(_("The download has completed.") + (self.scheduleInfo and " " + _("Next scheduled fetch is programmed for %s.") % self.scheduleInfo + " " or " ") +  _("Please don't forget that after downloading the first time the selected providers will need to be enabled in EPG-Importer plugin."))
 
 	def keySave(self):
@@ -346,7 +348,7 @@ def RadioTimesEmulatorGUICallback(close, answer):
 		close(True)
 
 def RadioTimesEmulatorWakeupTime():
-	print "[RadioTimesEmulator] next wakeup due %d" % config.plugins.RadioTimesEmulator.nextscheduletime.value
+	print("[RadioTimesEmulator] next wakeup due %d" % config.plugins.RadioTimesEmulator.nextscheduletime.value)
 	return config.plugins.RadioTimesEmulator.nextscheduletime.value > 0 and config.plugins.RadioTimesEmulator.nextscheduletime.value or -1
 
 def Plugins(**kwargs):
@@ -359,5 +361,5 @@ def Plugins(**kwargs):
 		if getImageDistro() in ("UNKNOWN",):
 			pList.append(PluginDescriptor(name=name, description=description, where=PluginDescriptor.WHERE_PLUGINMENU, fnc=start_from_plugins_menu, needsRestart=True))
 	else:
-		print "[RadioTimesEmulatorGUI] RadioTimesEmulator appears to be missing or no DVB-S tuner available."
+		print("[RadioTimesEmulatorGUI] RadioTimesEmulator appears to be missing or no DVB-S tuner available.")
 	return pList
