@@ -171,7 +171,7 @@ class RadioTimesEmulatorGUIScreen(ConfigListScreen, Screen):
 		temp = []
 		for provider in providers.keys():
 			temp.append((provider, providers[provider]["name"]))
-		return [i[0] for i in sorted(temp, key=lambda p: p[1].lower().decode('ascii','ignore'))]
+		return [i[0] for i in sorted(temp, key=lambda p: p[1].lower().decode('ascii', 'ignore'))]
 
 	def createSetup(self):
 		indent = "- "
