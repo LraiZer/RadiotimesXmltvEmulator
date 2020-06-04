@@ -1,3 +1,4 @@
+from __future__ import division
 #
 # Note for people skinning the scan screen...
 #
@@ -33,7 +34,7 @@ lockImageHeight = 36 # real height of .png
 textBoxHeight = 30
 fontSize = 22
 textBoxTopMargin = 4
-lockImageTopMargin = int((downloadBarHeight * multiplier / 2) - (lockImageHeight / 2))
+lockImageTopMargin = int((downloadBarHeight * multiplier / 2) - (lockImageHeight // 2))
 
 actionBoxLeftAlign = 7
 actionBoxWidth = 433
@@ -76,3 +77,4 @@ downloadBar = \
 	'</screen>\n'
 	
 #  scrollbarMode="showNever" scrollbarWidth="0" scrollbarSliderForegroundColor="FF000000" scrollbarSliderBorderColor="FF000000"
+

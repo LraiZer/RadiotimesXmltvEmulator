@@ -1,5 +1,6 @@
 from __future__ import print_function
 from __future__ import absolute_import
+from __future__ import division
 # for localized messages
 from . import _
 
@@ -119,7 +120,7 @@ class RadioTimesEmulator(Screen):
 			if not inStandby:
 				self["progress_text"].value = self.progresscurrent
 				self["progress"].setValue(self.progresscurrent)
-				self["action"].setText(_("Tuning %s, %s MHz") % (self.providers[self.actionsList[self.index]]["name"], str(self.transpondercurrent.frequency/1000)))
+				self["action"].setText(_("Tuning %s, %s MHz") % (self.providers[self.actionsList[self.index]]["name"], str(self.transpondercurrent.frequency//1000)))
 				self["status"].setText("")
 			self.searchtimer = eTimer()
 			self.searchtimer.callback.append(self.getFrontend)
@@ -267,10 +268,10 @@ class RadioTimesEmulator(Screen):
 		if self.isRotorSat(current_slotid, self.transpondercurrent.orbital_position):
 			self.motorised = True
 			self.LOCK_TIMEOUT = self.LOCK_TIMEOUT_ROTOR
-			print("[RadioTimesEmulator][getFrontend] Motorised dish. Will wait up to %i seconds for tuner lock." % (self.LOCK_TIMEOUT/10))
+			print("[RadioTimesEmulator][getFrontend] Motorised dish. Will wait up to %i seconds for tuner lock." % (self.LOCK_TIMEOUT//10))
 		else:
 			self.LOCK_TIMEOUT = self.LOCK_TIMEOUT_FIXED
-			print("[RadioTimesEmulator][getFrontend] Fixed dish. Will wait up to %i seconds for tuner lock." % (self.LOCK_TIMEOUT/10))
+			print("[RadioTimesEmulator][getFrontend] Fixed dish. Will wait up to %i seconds for tuner lock." % (self.LOCK_TIMEOUT//10))
 
 		self.selectedNIM = current_slotid  # Remember for downloading SI tables
 
@@ -321,7 +322,7 @@ class RadioTimesEmulator(Screen):
 			print("[RadioTimesEmulator][checkTunerLock] TUNER LOCKED")
 			from Screens.Standby import inStandby
 			if not inStandby:
-				self["action"].setText(_("Reading EPG from %s MHz") % (str(self.transpondercurrent.frequency/1000)))
+				self["action"].setText(_("Reading EPG from %s MHz") % (str(self.transpondercurrent.frequency//1000)))
 				#self["status"].setText(_("???"))
 
 			self.progresscurrent += 1
@@ -335,13 +336,13 @@ class RadioTimesEmulator(Screen):
 			return
 		elif self.dict["tuner_state"] in ("LOSTLOCK", "FAILED"):
 			print("[RadioTimesEmulator][checkTunerLock] TUNING FAILED")
-			self.showError(_('Tune failure. Provider %s. %s MHz. Tuner %s') % (self.providers[self.actionsList[self.index]]["name"], str(self.transpondercurrent.frequency/1000), chr(ord('A') + self.selectedNIM)))
+			self.showError(_('Tune failure. Provider %s. %s MHz. Tuner %s') % (self.providers[self.actionsList[self.index]]["name"], str(self.transpondercurrent.frequency//1000), chr(ord('A') + self.selectedNIM)))
 			return
 
 		self.lockcounter += 1
 		if self.lockcounter > self.LOCK_TIMEOUT:
 			print("[RadioTimesEmulator][checkTunerLock] Timeout for tuner lock")
-			self.showError(_('Tuner lock timeout. Provider %s. %s MHz. Tuner %s') % (self.providers[self.actionsList[self.index]]["name"], str(self.transpondercurrent.frequency/1000), chr(ord('A') + self.selectedNIM)))
+			self.showError(_('Tuner lock timeout. Provider %s. %s MHz. Tuner %s') % (self.providers[self.actionsList[self.index]]["name"], str(self.transpondercurrent.frequency//1000), chr(ord('A') + self.selectedNIM)))
 			return
 		self.locktimer.start(100, 1)
 
