@@ -7,8 +7,10 @@ import gettext
 PluginLanguageDomain = "RadioTimesEmulator"
 PluginLanguagePath = "SystemPlugins/RadioTimesEmulator/locale"
 
+
 def localeInit():
 	gettext.bindtextdomain(PluginLanguageDomain, resolveFilename(SCOPE_PLUGINS, PluginLanguagePath))
+
 
 def _(txt):
 	if gettext.dgettext(PluginLanguageDomain, txt):

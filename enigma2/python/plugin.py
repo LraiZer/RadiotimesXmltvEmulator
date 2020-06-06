@@ -36,6 +36,7 @@ from .about import RadioTimesEmulatorAbout
 paths = []
 default_path = ""
 
+
 def updatePaths():
 	global paths
 	global default_path
@@ -65,11 +66,13 @@ config.plugins.RadioTimesEmulator.days = ConfigSubDict()
 for i in range(len(days)):
 	config.plugins.RadioTimesEmulator.days[i] = ConfigEnableDisable(default=True)
 
+
 def onPartitionChange(why, part):
 	if why == 'add':
 		onMountpointAdded(part.mountpoint)
 	elif why == 'remove':
 		onMountpointRemoved(part.mountpoint)
+
 
 def onMountpointAdded(mountpoint):
 	global paths
@@ -77,6 +80,7 @@ def onMountpointAdded(mountpoint):
 	if mountpoint not in paths:
 		paths.append(mountpoint)
 		config.plugins.RadioTimesEmulator.database_location.setChoices(choices=paths, default=default_path)
+
 
 def onMountpointRemoved(mountpoint):
 	global paths
@@ -337,19 +341,24 @@ def RadioTimesEmulatorGUIStart(menuid, **kwargs):
 		return [(_("Radio Times Emulator OpenTV Import"), RadioTimesEmulatorGUIMain, "RadioTimesEmulatorGUIScreen", 1000, True)]
 	return []
 
+
 def start_from_plugins_menu(session, **kwargs):
     session.open(RadioTimesEmulatorGUIScreen)
 
+
 def RadioTimesEmulatorGUIMain(session, close=None, **kwargs):
 	session.openWithCallback(boundFunction(RadioTimesEmulatorGUICallback, close), RadioTimesEmulatorGUIScreen)
+
 
 def RadioTimesEmulatorGUICallback(close, answer):
 	if close and answer:
 		close(True)
 
+
 def RadioTimesEmulatorWakeupTime():
 	print("[RadioTimesEmulator] next wakeup due %d" % config.plugins.RadioTimesEmulator.nextscheduletime.value)
 	return config.plugins.RadioTimesEmulator.nextscheduletime.value > 0 and config.plugins.RadioTimesEmulator.nextscheduletime.value or -1
+
 
 def Plugins(**kwargs):
 	name = _("Radio Times Emulator OpenTV Downloader")

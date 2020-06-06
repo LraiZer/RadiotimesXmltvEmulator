@@ -11,6 +11,8 @@ from .RadioTimesEmulator import RadioTimesEmulator
 from time import localtime, time, strftime, mktime
 
 autoScheduleTimer = None
+
+
 def Scheduleautostart(reason, session=None, **kwargs):
 	#
 	# This gets called twice at start up,once by WHERE_AUTOSTART without session,
@@ -50,6 +52,7 @@ def Scheduleautostart(reason, session=None, **kwargs):
 		print("[RadioTimesEmulator][Scheduleautostart] Stop")
 		if autoScheduleTimer is not None:
 			autoScheduleTimer.schedulestop()
+
 
 class AutoScheduleTimer:
 	instance = None

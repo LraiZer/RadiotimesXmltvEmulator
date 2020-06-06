@@ -6,6 +6,7 @@ import re
 emulator_path = "/usr/radiotimes_emulator"
 epg_import_sources_path = "/etc/epgimport"
 
+
 class Providers():
 	def providerFileExists(self, key):
 		filename = "%s/providers/%s.conf" % (emulator_path, key)

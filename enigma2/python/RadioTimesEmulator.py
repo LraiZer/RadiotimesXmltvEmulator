@@ -26,6 +26,7 @@ import re
 
 from .RadioTimesEmulatorSkin import downloadBar
 
+
 class RadioTimesEmulator(Screen):
 	skin = downloadBar
 
@@ -424,6 +425,7 @@ class RadioTimesEmulator(Screen):
 
 	def __onClose(self):
 		self.closeFrontend()
+
 
 class RadioTimesEmulatorDisplayOutput(Console):
 	skin = downloadBar
