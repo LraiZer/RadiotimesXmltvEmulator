@@ -429,6 +429,7 @@ class RadioTimesEmulator(Screen):
 
 class RadioTimesEmulatorDisplayOutput(Console):
 	skin = downloadBar
+
 	def __init__(self, session, title="Console", cmdlist=None, finishedCallback=None, closeOnSuccess=False, prefix=""):
 		Console.__init__(self, session, title, cmdlist, finishedCallback, closeOnSuccess)
 		self.prefix = prefix

@@ -56,6 +56,7 @@ def Scheduleautostart(reason, session=None, **kwargs):
 
 class AutoScheduleTimer:
 	instance = None
+
 	def __init__(self, session):
 		self.schedulename = "RadioTimesEmulator"
 		self.config = config.plugins.RadioTimesEmulator

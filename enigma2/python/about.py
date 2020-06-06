@@ -5,6 +5,7 @@ from Components.ActionMap import ActionMap
 
 
 class RadioTimesEmulatorAbout(Screen):
+
 	def __init__(self, session):
 		self.session = session
 		Screen.__init__(self, session)

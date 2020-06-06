@@ -100,6 +100,7 @@ harddiskmanager.on_partition_list_change.append(onPartitionChange)
 
 
 class RadioTimesEmulatorGUIScreen(ConfigListScreen, Screen):
+
 	def __init__(self, session):
 		Screen.__init__(self, session)
 		self.setup_title = _('Radio Times Emulator') + " - " + _('Setup')
@@ -293,6 +294,7 @@ class RadioTimesEmulatorGUIScreen(ConfigListScreen, Screen):
 
 
 class RadioTimesEmulatorDaysScreen(ConfigListScreen, Screen):
+
 	def __init__(self, session, args=0):
 		self.session = session
 		Screen.__init__(self, session)

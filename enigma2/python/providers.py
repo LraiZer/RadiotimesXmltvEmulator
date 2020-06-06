@@ -8,6 +8,7 @@ epg_import_sources_path = "/etc/epgimport"
 
 
 class Providers():
+
 	def providerFileExists(self, key):
 		filename = "%s/providers/%s.conf" % (emulator_path, key)
 		return fileExists(filename)
@@ -67,6 +68,7 @@ class Providers():
 
 
 class ProviderConfig():
+
 	def __init__(self, value=""):
 		self.provider = value
 
