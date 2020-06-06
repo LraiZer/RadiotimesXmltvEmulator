@@ -100,7 +100,7 @@ class RadioTimesEmulator(Screen):
 			if not inStandby:
 				self["action"].setText(_('Starting download...'))
 				self["status"].setText("")
-			self.progresscount = len(self.actionsList)* 4 + 2
+			self.progresscount = len(self.actionsList) * 4 + 2
 			self.progresscurrent = 1
 			from Screens.Standby import inStandby
 			if not inStandby:
