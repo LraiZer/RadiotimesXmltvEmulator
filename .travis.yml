@@ -4,6 +4,7 @@ os: linux
 
 python:
   - "2.7"
+  - "3.5"
   - "3.8"
 
 compiler:
@@ -18,6 +19,9 @@ git:
 branches:
   only:
   - gui-plugin
+
+install:
+  - pip install flake8
 
 jobs:
   include:
@@ -43,6 +47,14 @@ jobs:
           sources: *sources
           packages:
             - g++-9
+    - name: "GNU Compiler Collection 10"
+      env: CC=gcc-10 CXX=g++-10
+      addons:
+        apt:
+          sources: *sources
+          packages:
+            - g++-10
+
 script:
   - export CXXFLAGS="-g -Wall"
   - export CFLAGS="-g -Wall"
@@ -50,3 +62,9 @@ script:
   - make
   - python -m compileall -l enigma2/python
   - find . -type f -name "*.po" -exec msgfmt {} -o {}.mo \;
+  - flake8 --ignore=W191,E501 . --exit-zero
+
+# PEP8 :- IGNORE CODES
+# W191 : indentation contains tabs
+# E501 : line too long (> 79 characters)
+
