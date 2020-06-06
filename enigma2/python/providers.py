@@ -66,7 +66,7 @@ class Providers():
 
 
 class ProviderConfig():
-	def __init__(self, value = ""):
+	def __init__(self, value=""):
 		self.provider = value
 
 	def isValid(self):

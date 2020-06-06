@@ -53,17 +53,17 @@ config.plugins.RadioTimesEmulator.database_location = ConfigSelection(default=de
 config.plugins.RadioTimesEmulator.providers = ConfigText("", False)
 config.plugins.RadioTimesEmulator.no_dvb_polling = ConfigYesNo(default=False)
 config.plugins.RadioTimesEmulator.carousel_dvb_polling = ConfigYesNo(default=False)
-config.plugins.RadioTimesEmulator.schedule = ConfigYesNo(default = False)
-config.plugins.RadioTimesEmulator.scheduletime = ConfigClock(default = 0) # 1:00
-config.plugins.RadioTimesEmulator.nextscheduletime = ConfigNumber(default = 0)
-config.plugins.RadioTimesEmulator.schedulewakefromdeep = ConfigYesNo(default = True)
-config.plugins.RadioTimesEmulator.scheduleshutdown = ConfigYesNo(default = True)
-config.plugins.RadioTimesEmulator.dayscreen = ConfigSelection(choices = [("1", _("Press OK"))], default = "1")
-config.plugins.RadioTimesEmulator.retry = ConfigNumber(default = 30)
-config.plugins.RadioTimesEmulator.retrycount = NoSave(ConfigNumber(default = 0))
+config.plugins.RadioTimesEmulator.schedule = ConfigYesNo(default=False)
+config.plugins.RadioTimesEmulator.scheduletime = ConfigClock(default=0) # 1:00
+config.plugins.RadioTimesEmulator.nextscheduletime = ConfigNumber(default=0)
+config.plugins.RadioTimesEmulator.schedulewakefromdeep = ConfigYesNo(default=True)
+config.plugins.RadioTimesEmulator.scheduleshutdown = ConfigYesNo(default=True)
+config.plugins.RadioTimesEmulator.dayscreen = ConfigSelection(choices=[("1", _("Press OK"))], default="1")
+config.plugins.RadioTimesEmulator.retry = ConfigNumber(default=30)
+config.plugins.RadioTimesEmulator.retrycount = NoSave(ConfigNumber(default=0))
 config.plugins.RadioTimesEmulator.days = ConfigSubDict()
 for i in range(len(days)):
-	config.plugins.RadioTimesEmulator.days[i] = ConfigEnableDisable(default = True)
+	config.plugins.RadioTimesEmulator.days[i] = ConfigEnableDisable(default=True)
 
 def onPartitionChange(why, part):
 	if why == 'add':
@@ -104,7 +104,7 @@ class RadioTimesEmulatorGUIScreen(ConfigListScreen, Screen):
 		self.config = config.plugins.RadioTimesEmulator
 		self.onChangedEntry = []
 		self.session = session
-		ConfigListScreen.__init__(self, [], session = session, on_change = self.changedEntry)
+		ConfigListScreen.__init__(self, [], session=session, on_change=self.changedEntry)
 
 		self["actions2"] = ActionMap(["SetupActions", "ColorActions"],
 		{
@@ -165,7 +165,7 @@ class RadioTimesEmulatorGUIScreen(ConfigListScreen, Screen):
 
 		# build providers configurations
 		for provider in self.providers.keys():
-			self.providers_configs[provider] = ConfigYesNo(default = provider in providers_tmp_configs.keys())
+			self.providers_configs[provider] = ConfigYesNo(default=provider in providers_tmp_configs.keys())
 
 	def providerKeysInNameOrder(self, providers):
 		temp = []
@@ -289,7 +289,7 @@ class RadioTimesEmulatorGUIScreen(ConfigListScreen, Screen):
 
 
 class RadioTimesEmulatorDaysScreen(ConfigListScreen, Screen):
-	def __init__(self, session, args = 0):
+	def __init__(self, session, args=0):
 		self.session = session
 		Screen.__init__(self, session)
 		Screen.setTitle(self, _('Radio Times Emulator') + " - " + _("Select days"))
@@ -312,7 +312,7 @@ class RadioTimesEmulatorDaysScreen(ConfigListScreen, Screen):
 
 	def keySave(self):
 		if not any([self.config.days[i].value for i in self.config.days]):
-			info = self.session.open(MessageBox, _("At least one day of the week must be selected"), MessageBox.TYPE_ERROR, timeout = 30)
+			info = self.session.open(MessageBox, _("At least one day of the week must be selected"), MessageBox.TYPE_ERROR, timeout=30)
 			info.setTitle(_('Radio Times Emulator') + " - " + _("Select days"))
 			return
 		for x in self["config"].list:

@@ -29,7 +29,7 @@ from .RadioTimesEmulatorSkin import downloadBar
 class RadioTimesEmulator(Screen):
 	skin = downloadBar
 
-	def __init__(self, session, args = 0):
+	def __init__(self, session, args=0):
 		print("[RadioTimesEmulator][__init__] Starting...")
 		print("[RadioTimesEmulator][__init__] args", args)
 		self.session = session
@@ -55,7 +55,7 @@ class RadioTimesEmulator(Screen):
 		self.frontend = None
 		from Screens.Standby import inStandby
 		if not inStandby:
-			self["Frontend"] = FrontendStatus(frontend_source = lambda : self.frontend, update_interval = 100)
+			self["Frontend"] = FrontendStatus(frontend_source=lambda : self.frontend, update_interval=100)
 		self.rawchannel = None
 #		self.session.postScanService = self.session.nav.getCurrentlyPlayingServiceOrGroup()
 		self.postScanService = None
@@ -354,8 +354,8 @@ class RadioTimesEmulator(Screen):
 			RadioTimesEmulatorDisplayOutput,
 			_("Radio Times Emulator - Downloading %s") % self.providers[self.actionsList[self.index]]["name"], # this shows as the cosole title if you use the default console screen as the display.
 			[command],
-			closeOnSuccess = True,
-			prefix = "%s: " % self.providers[self.actionsList[self.index]]["name"])
+			closeOnSuccess=True,
+			prefix="%s: " % self.providers[self.actionsList[self.index]]["name"])
 
 	def readTransponderCallback(self):
 		self.progresscurrent += 1
@@ -427,7 +427,7 @@ class RadioTimesEmulator(Screen):
 
 class RadioTimesEmulatorDisplayOutput(Console):
 	skin = downloadBar
-	def __init__(self, session, title = "Console", cmdlist = None, finishedCallback = None, closeOnSuccess = False, prefix = ""):
+	def __init__(self, session, title="Console", cmdlist=None, finishedCallback=None, closeOnSuccess=False, prefix=""):
 		Console.__init__(self, session, title, cmdlist, finishedCallback, closeOnSuccess)
 		self.prefix = prefix
 		from Screens.Standby import inStandby
