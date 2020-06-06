@@ -367,11 +367,11 @@ class RadioTimesEmulator(Screen):
 			src_filename = "%s/otv_%s.sources.xml" % (self.databaseLocation, self.actionsList[self.index])
 			dest_filename = "%s/otv_%s.sources.xml" % (epg_import_sources_path, self.actionsList[self.index])
 			try:
-				 with open(src_filename, "r") as s:
-				 	with open(dest_filename, "w") as d:
-				 		d.write(s.read())
-				 		d.close()
-				 	s.close()
+				with open(src_filename, "r") as s:
+					with open(dest_filename, "w") as d:
+						d.write(s.read())
+						d.close()
+					s.close()
 			except IOError:
 				print("[RadioTimesEmulator] failed to copy %s to %s" % (src_filename, dest_filename))
 		self.progresscurrent += 1
