@@ -345,7 +345,7 @@ def RadioTimesEmulatorGUIStart(menuid, **kwargs):
 
 
 def start_from_plugins_menu(session, **kwargs):
-    session.open(RadioTimesEmulatorGUIScreen)
+	session.open(RadioTimesEmulatorGUIScreen)
 
 
 def RadioTimesEmulatorGUIMain(session, close=None, **kwargs):
