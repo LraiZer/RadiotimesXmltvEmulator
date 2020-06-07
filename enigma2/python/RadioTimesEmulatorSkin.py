@@ -19,10 +19,10 @@ from enigma import getDesktop
 
 color = {
 	"transpBlack": "#54111112",
-#	"black" : "#00000000",
-#	"red": "#00ff0000",
-#	"grey": "#00888888",
-#	"green": "#0056c856",
+	# "black" : "#00000000",
+	# "red": "#00ff0000",
+	# "grey": "#00888888",
+	# "green": "#0056c856",
 	}
 plugin_root_folder = os.path.dirname(sys.modules[__name__].__file__)  # no trailing slash
 defaultDesktopHeight = 720
