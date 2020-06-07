@@ -96,7 +96,7 @@ class AutoScheduleTimer:
 	def getScheduleDayOfWeek(self):
 		today = self.getToday()
 		for i in range(1, 8):
-			if self.config.days[(today+i)%7].value:
+			if self.config.days[(today + i)%7].value:
 				return i
 
 	def getToday(self):
@@ -108,9 +108,9 @@ class AutoScheduleTimer:
 		now = int(time())
 		if self.ScheduleTime > 0:
 			if self.ScheduleTime < now + atLeast:
-				self.ScheduleTime += 86400*self.getScheduleDayOfWeek()
+				self.ScheduleTime += 86400 * self.getScheduleDayOfWeek()
 			elif not self.config.days[self.getToday()].value:
-				self.ScheduleTime += 86400*self.getScheduleDayOfWeek()
+				self.ScheduleTime += 86400 * self.getScheduleDayOfWeek()
 			next = self.ScheduleTime - now
 			self.scheduletimer.startLongTimer(next)
 		else:
