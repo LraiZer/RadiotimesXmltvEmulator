@@ -19,7 +19,7 @@ from Screens.Screen import Screen
 from Tools.BoundFunction import boundFunction
 from Tools.Directories import pathExists
 
-from os import statvfs # to get disc free space
+from os import statvfs  # to get disc free space
 
 try:
 	from boxbranding import getImageDistro
@@ -41,7 +41,7 @@ def updatePaths():
 	global paths
 	global default_path
 	# some images return the mount point with a trailing slash, others don't. Use map to make sure the slash is added where it is not present
-	paths = ["/tmp/"] + map(lambda x: x.endswith("/") and x or "%s/" % x, [part.mountpoint for part in harddiskmanager.getMountedPartitions() if pathExists(part.mountpoint) and not part.mountpoint == "/" and not part.mountpoint.startswith('/media/net') and not part.mountpoint.startswith('/media/autofs')]) # no remote paths
+	paths = ["/tmp/"] + map(lambda x: x.endswith("/") and x or "%s/" % x, [part.mountpoint for part in harddiskmanager.getMountedPartitions() if pathExists(part.mountpoint) and not part.mountpoint == "/" and not part.mountpoint.startswith('/media/net') and not part.mountpoint.startswith('/media/autofs')])  # no remote paths
 	default_path = "/media/hdd/" if "/media/hdd/" in paths else "/tmp/"
 
 updatePaths()
@@ -55,7 +55,7 @@ config.plugins.RadioTimesEmulator.providers = ConfigText("", False)
 config.plugins.RadioTimesEmulator.no_dvb_polling = ConfigYesNo(default=False)
 config.plugins.RadioTimesEmulator.carousel_dvb_polling = ConfigYesNo(default=False)
 config.plugins.RadioTimesEmulator.schedule = ConfigYesNo(default=False)
-config.plugins.RadioTimesEmulator.scheduletime = ConfigClock(default=0) # 1:00
+config.plugins.RadioTimesEmulator.scheduletime = ConfigClock(default=0)  # 1:00
 config.plugins.RadioTimesEmulator.nextscheduletime = ConfigNumber(default=0)
 config.plugins.RadioTimesEmulator.schedulewakefromdeep = ConfigYesNo(default=True)
 config.plugins.RadioTimesEmulator.scheduleshutdown = ConfigYesNo(default=True)

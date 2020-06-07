@@ -115,7 +115,7 @@ class RadioTimesEmulator(Screen):
 			self.showError(_('No providers to search. Please select at least one provider in the setup menu.'))
 
 	def readStreams(self):
-		if self.index < len(self.actionsList): # some providers still need to be read
+		if self.index < len(self.actionsList):  # some providers still need to be read
 			self.transpondercurrent = self.getTransponder(self.providers[self.actionsList[self.index]]["transponder"])
 			from Screens.Standby import inStandby
 			if not inStandby:
@@ -126,7 +126,7 @@ class RadioTimesEmulator(Screen):
 			self.searchtimer = eTimer()
 			self.searchtimer.callback.append(self.getFrontend)
 			self.searchtimer.start(100, 1)
-		else: # all providers have been read.
+		else:  # all providers have been read.
 			self.closeFrontend()
 			if self.postScanService:
 				self.session.nav.playService(self.postScanService)
@@ -142,7 +142,7 @@ class RadioTimesEmulator(Screen):
 			self.closetimer.start(2000, 1)
 
 	def getTransponder(self, tp):
-		PLS_Default_Gold_Code = hasattr(eDVBFrontendParametersSatellite, "PLS_Default_Gold_Code") and eDVBFrontendParametersSatellite.PLS_Default_Gold_Code or 0 # Hack for OpenPLi 7.0
+		PLS_Default_Gold_Code = hasattr(eDVBFrontendParametersSatellite, "PLS_Default_Gold_Code") and eDVBFrontendParametersSatellite.PLS_Default_Gold_Code or 0  # Hack for OpenPLi 7.0
 		parm = eDVBFrontendParametersSatellite()
 		parm.frequency = tp["frequency"]
 		parm.symbol_rate = tp["symbol_rate"]
@@ -223,9 +223,9 @@ class RadioTimesEmulator(Screen):
 		self.frontend = None
 		self.rawchannel = None
 
-		nimList = [slot for slot in nimList if not self.isRotorSat(slot, self.transpondercurrent.orbital_position)] + [slot for slot in nimList if self.isRotorSat(slot, self.transpondercurrent.orbital_position)] #If we have a choice of dishes try "fixed" before "motorised".
+		nimList = [slot for slot in nimList if not self.isRotorSat(slot, self.transpondercurrent.orbital_position)] + [slot for slot in nimList if self.isRotorSat(slot, self.transpondercurrent.orbital_position)]  # If we have a choice of dishes try "fixed" before "motorised".
 		for slotid in nimList:
-			if current_slotid == -1:	# mark the first valid slotid in case of no other one is free
+			if current_slotid == -1:  # mark the first valid slotid in case of no other one is free
 				current_slotid = slotid
 
 			self.rawchannel = resmanager.allocateRawChannel(slotid)
@@ -317,7 +317,7 @@ class RadioTimesEmulator(Screen):
 		self.dict = {}
 		self.frontend.getFrontendStatus(self.dict)
 		if self.dict["tuner_state"] == "TUNING":
-			if self.lockcounter < 1: # only show this once in the log per retune event
+			if self.lockcounter < 1:  # only show this once in the log per retune event
 				print("[RadioTimesEmulator][checkTunerLock] TUNING")
 		elif self.dict["tuner_state"] == "LOCKED":
 			print("[RadioTimesEmulator][checkTunerLock] TUNER LOCKED")
@@ -353,7 +353,7 @@ class RadioTimesEmulator(Screen):
 		self.session.openWithCallback(
 			self.readTransponderCallback,
 			RadioTimesEmulatorDisplayOutput,
-			_("Radio Times Emulator - Downloading %s") % self.providers[self.actionsList[self.index]]["name"], # this shows as the cosole title if you use the default console screen as the display.
+			_("Radio Times Emulator - Downloading %s") % self.providers[self.actionsList[self.index]]["name"],  # this shows as the cosole title if you use the default console screen as the display.
 			[command],
 			closeOnSuccess=True,
 			prefix="%s: " % self.providers[self.actionsList[self.index]]["name"])
@@ -410,7 +410,7 @@ class RadioTimesEmulator(Screen):
 		return "%s/radiotimes_emulator -d %s -p %s -x /dev/dvb/adapter0/demux%d -f %d%s%s%s" % (
 			emulator_path,
 			self.databaseLocation,
-			self.actionsList[self.index], # provider key
+			self.actionsList[self.index],  # provider key
 			self.demuxer_id,
 			self.selectedNIM,
 			config.plugins.RadioTimesEmulator.no_dvb_polling.value and " -n" or "",

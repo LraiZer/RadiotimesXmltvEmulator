@@ -70,7 +70,7 @@ class AutoScheduleTimer:
 		now = int(time())
 		if self.config.schedule.value:
 			print("[%s][AutoScheduleTimer] Schedule Enabled at " % self.schedulename, strftime("%c", localtime(now)))
-			if now > 1546300800: # Tuesday, January 1, 2019 12:00:00 AM
+			if now > 1546300800:  # Tuesday, January 1, 2019 12:00:00 AM
 				self.scheduledate()
 			else:
 				print("[%s][AutoScheduleTimer] STB clock not yet set." % self.schedulename)
@@ -172,7 +172,7 @@ class AutoScheduleTimer:
 			print("[%s] Returning to deep standby after scheduled wakeup" % self.schedulename)
 			self.session.open(TryQuitMainloop, 1)
 
-	def doneConfiguring(self): # called from plugin on save
+	def doneConfiguring(self):  # called from plugin on save
 		now = int(time())
 		if self.config.schedule.value:
 			if autoScheduleTimer is not None:

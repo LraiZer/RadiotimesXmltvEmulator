@@ -24,13 +24,13 @@ color = {
 #	"grey": "#00888888",
 #	"green": "#0056c856",
 	}
-plugin_root_folder = os.path.dirname(sys.modules[__name__].__file__) # no trailing slash
+plugin_root_folder = os.path.dirname(sys.modules[__name__].__file__)  # no trailing slash
 defaultDesktopHeight = 720
 defaultDesktopWidth = 1280
 multiplier = getDesktop(0).size().height() and 1.0 * getDesktop(0).size().height() / defaultDesktopHeight or 1.0
 downloadBarHeight = 36
-lockImageWidth = 38 # real width of .png
-lockImageHeight = 36 # real height of .png
+lockImageWidth = 38  # real width of .png
+lockImageHeight = 36  # real height of .png
 textBoxHeight = 30
 fontSize = 22
 textBoxTopMargin = 4
@@ -45,7 +45,7 @@ lockImageRightAlign = 954
 tunerBoxLeftAlign = 955
 tunerBoxWidth = fontSize
 snrBoxLeftAlign = 980
-snrBoxWidth = 87 # up to 7 chars, e.g. "16.2 dB"
+snrBoxWidth = 87  # up to 7 chars, e.g. "16.2 dB"
 progressTextBoxLeftAlign = 1080
 progressTextBoxWidth = 87
 progressPercentLeftAlign = 1187
