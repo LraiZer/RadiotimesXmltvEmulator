@@ -239,7 +239,7 @@ class RadioTimesEmulator(Screen):
 
 		if current_slotid == -1:
 			print("[RadioTimesEmulator][getFrontend] No valid NIM found")
-			self.showError(_('No valid NIM found for %s') % PROVIDERS[config.plugins.RadioTimesEmulator.provider.value]["name"])
+			self.showError(_('No valid NIM found for %s') % self.providers[self.actionsList[self.index]]["name"])
 			return
 
 		if not self.rawchannel:

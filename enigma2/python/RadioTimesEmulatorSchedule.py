@@ -1,5 +1,8 @@
 from __future__ import print_function
 from __future__ import absolute_import
+# for localized messages
+from . import _
+
 from Components.config import config, configfile
 
 from Screens.MessageBox import MessageBox
