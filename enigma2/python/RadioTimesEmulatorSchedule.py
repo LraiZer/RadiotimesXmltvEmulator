@@ -169,7 +169,7 @@ class AutoScheduleTimer:
 		self.session.openWithCallback(self.runscheduleditemCallback, self.itemtorun)
 
 	def runscheduleditemCallback(self):
-		from Screens.Standby import Standby, inStandby, TryQuitMainloop, inTryQuitMainloop
+		from Screens.Standby import inStandby, TryQuitMainloop, inTryQuitMainloop
 		print("[%s][runscheduleditemCallback] inStandby" % self.schedulename, inStandby)
 		if self.config.schedule.value and wasScheduleTimerWakeup and inStandby and self.config.scheduleshutdown.value and not self.session.nav.getRecordings() and not inTryQuitMainloop:
 			print("[%s] Returning to deep standby after scheduled wakeup" % self.schedulename)
