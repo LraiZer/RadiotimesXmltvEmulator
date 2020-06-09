@@ -33,7 +33,6 @@ def Scheduleautostart(reason, session=None, **kwargs):
 	global autoScheduleTimer
 	global wasScheduleTimerWakeup
 	wasScheduleTimerWakeup = False
-	now = int(time())
 	if reason == 0:
 		if config.plugins.RadioTimesEmulator.schedule.value:
 			# check if box was woken up by a timer, if so, check if this plugin set this timer. This is not conclusive.
