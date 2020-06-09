@@ -96,7 +96,7 @@ class AutoScheduleTimer:
 	def getScheduleDayOfWeek(self):
 		today = self.getToday()
 		for i in range(1, 8):
-			if self.config.days[(today + i)%7].value:
+			if self.config.days[(today + i) %7].value:
 				return i
 
 	def getToday(self):
