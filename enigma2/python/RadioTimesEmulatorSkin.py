@@ -75,6 +75,6 @@ downloadBar = \
 	'		<convert type="ProgressToText">InPercent</convert>\n' + \
 	'	</widget>\n' + \
 	'</screen>\n'
-	
+
 #  scrollbarMode="showNever" scrollbarWidth="0" scrollbarSliderForegroundColor="FF000000" scrollbarSliderBorderColor="FF000000"
 
