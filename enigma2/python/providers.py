@@ -33,17 +33,17 @@ class Providers():
 	def getTransponder(self, lines):
 		transponder = {}
 		transponder_keys = [
-				"frequency",
-				"symbol_rate",
-				"polarization",
-				"fec_inner",
-				"orbital_position",
-				"inversion",
-				"system",
-				"modulation",
-				"roll_off",
-				"pilot",
-			]
+			"frequency",
+			"symbol_rate",
+			"polarization",
+			"fec_inner",
+			"orbital_position",
+			"inversion",
+			"system",
+			"modulation",
+			"roll_off",
+			"pilot",
+		]
 		pattern = re.compile(r"(.*)=([0-9]+)")
 		for line in lines:
 			parm = re.search(pattern, line.strip())
