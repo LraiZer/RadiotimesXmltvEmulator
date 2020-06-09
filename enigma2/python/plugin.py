@@ -292,7 +292,7 @@ class RadioTimesEmulatorGUIScreen(ConfigListScreen, Screen):
 
 	def keyDelete(self):
 		self.session.open(RadioTimesEmulatorAbout)
-		#pass
+		# pass
 
 
 class RadioTimesEmulatorDaysScreen(ConfigListScreen, Screen):

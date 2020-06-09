@@ -58,11 +58,11 @@ class RadioTimesEmulator(Screen):
 		if not inStandby:
 			self["Frontend"] = FrontendStatus(frontend_source=lambda: self.frontend, update_interval=100)
 		self.rawchannel = None
-#		self.session.postScanService = self.session.nav.getCurrentlyPlayingServiceOrGroup()
+		# self.session.postScanService = self.session.nav.getCurrentlyPlayingServiceOrGroup()
 		self.postScanService = None
 		self.index = 0
-		self.LOCK_TIMEOUT_ROTOR = 1200 	# 100ms for tick - 120 sec
-		self.LOCK_TIMEOUT_FIXED = 50 	# 100ms for tick - 5 sec
+		self.LOCK_TIMEOUT_ROTOR = 1200  # 100ms for tick - 120 sec
+		self.LOCK_TIMEOUT_FIXED = 50  # 100ms for tick - 5 sec
 
 		self.LOCK_TIMEOUT = self.LOCK_TIMEOUT_FIXED
 		self.databaseLocation = "%sradiotimes" % config.plugins.RadioTimesEmulator.database_location.value
@@ -295,11 +295,11 @@ class RadioTimesEmulator(Screen):
 		params_fe = eDVBFrontendParameters()
 		params_fe.setDVBS(self.transpondercurrent, False)
 
-#		try:
-#			self.rawchannel.requestTsidOnid()
-#		except (TypeError):
-#			# for compatibility with some third party images
-#			self.rawchannel.requestTsidOnid(self.gotTsidOnid)
+		# try:
+		#     self.rawchannel.requestTsidOnid()
+		# except (TypeError):
+		#     # for compatibility with some third party images
+		#     self.rawchannel.requestTsidOnid(self.gotTsidOnid)
 
 		self.frontend.tune(params_fe)
 
@@ -324,7 +324,7 @@ class RadioTimesEmulator(Screen):
 			from Screens.Standby import inStandby
 			if not inStandby:
 				self["action"].setText(_("Reading EPG from %s MHz") % (str(self.transpondercurrent.frequency // 1000)))
-				#self["status"].setText(_("???"))
+				# self["status"].setText(_("???"))
 
 			self.progresscurrent += 1
 			from Screens.Standby import inStandby
@@ -440,7 +440,7 @@ class RadioTimesEmulatorDisplayOutput(Console):
 	def dataAvail(self, str):
 		from Screens.Standby import inStandby
 		if not inStandby:
-#			self["text"].appendText(str) # Appending to this variable crashes OpenATV (ScrollLabel.py) if the variable is not used in the skin
+			# self["text"].appendText(str) # Appending to this variable crashes OpenATV (ScrollLabel.py) if the variable is not used in the skin
 			str_no_date = re.sub(r'[0-9]+\/[0-9]+\/[0-9]+\s[0-9]+[:][0-9]+[:][0-9]+', '', str).strip()
 			if str_no_date:
 				self["actionLong"].setText("%s%s" % (self.prefix, re.sub(r'\s\s+', ".. ", str_no_date)))
