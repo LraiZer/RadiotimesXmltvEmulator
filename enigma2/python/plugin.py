@@ -44,6 +44,7 @@ def updatePaths():
 	paths = ["/tmp/"] + map(lambda x: x.endswith("/") and x or "%s/" % x, [part.mountpoint for part in harddiskmanager.getMountedPartitions() if pathExists(part.mountpoint) and not part.mountpoint == "/" and not part.mountpoint.startswith('/media/net') and not part.mountpoint.startswith('/media/autofs')])  # no remote paths
 	default_path = "/media/hdd/" if "/media/hdd/" in paths else "/tmp/"
 
+
 updatePaths()
 
 days = (_("Monday"), _("Tuesday"), _("Wednesday"), _("Thursday"), _("Friday"), _("Saturday"), _("Sunday"))
@@ -95,6 +96,7 @@ def onMountpointRemoved(mountpoint):
 		config.plugins.RadioTimesEmulator.database_location.value = default_path
 		config.plugins.RadioTimesEmulator.database_location.save()
 		configfile.save()
+
 
 harddiskmanager.on_partition_list_change.append(onPartitionChange)
 
