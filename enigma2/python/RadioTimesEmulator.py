@@ -56,7 +56,7 @@ class RadioTimesEmulator(Screen):
 		self.frontend = None
 		from Screens.Standby import inStandby
 		if not inStandby:
-			self["Frontend"] = FrontendStatus(frontend_source=lambda : self.frontend, update_interval=100)
+			self["Frontend"] = FrontendStatus(frontend_source=lambda: self.frontend, update_interval=100)
 		self.rawchannel = None
 #		self.session.postScanService = self.session.nav.getCurrentlyPlayingServiceOrGroup()
 		self.postScanService = None
