@@ -65,13 +65,13 @@ downloadBar = \
 	'		<convert type="ConditionalShowHide">Invert</convert>\n' + \
 	'	</widget>\n' + \
 	'	<widget name="tuner_text" conditional="tuner_text" position="%d,%d" size="%d,%d" font="Regular;%d" halign="center" backgroundColor="%s"/>\n' % (int(tunerBoxLeftAlign * multiplier), int(textBoxTopMargin * multiplier), int(tunerBoxWidth * multiplier), int(textBoxHeight * multiplier), int(fontSize * multiplier), color["transpBlack"]) + \
-	'	<widget source="Frontend" conditional="Frontend" render="Label" position="%d,%d" size="%d,%d" font="Regular;%d" halign="left" backgroundColor="%s">\n' % (int(snrBoxLeftAlign * multiplier), int(textBoxTopMargin * multiplier), int(snrBoxWidth * multiplier), int(textBoxHeight * multiplier), int(fontSize * multiplier),  color["transpBlack"]) + \
+	'	<widget source="Frontend" conditional="Frontend" render="Label" position="%d,%d" size="%d,%d" font="Regular;%d" halign="left" backgroundColor="%s">\n' % (int(snrBoxLeftAlign * multiplier), int(textBoxTopMargin * multiplier), int(snrBoxWidth * multiplier), int(textBoxHeight * multiplier), int(fontSize * multiplier), color["transpBlack"]) + \
 	'		<convert type="FrontendInfo">SNRdB</convert>\n' + \
 	'	</widget>\n' + \
-	'	<widget source="progress_text" conditional="progress_text" render="Label" position="%d,%d" size="%d,%d" font="Regular;%d" halign="right" backgroundColor="%s">\n' % (int(progressTextBoxLeftAlign * multiplier), int(textBoxTopMargin * multiplier), int(progressTextBoxWidth * multiplier), int(textBoxHeight * multiplier), int(fontSize * multiplier),  color["transpBlack"]) + \
+	'	<widget source="progress_text" conditional="progress_text" render="Label" position="%d,%d" size="%d,%d" font="Regular;%d" halign="right" backgroundColor="%s">\n' % (int(progressTextBoxLeftAlign * multiplier), int(textBoxTopMargin * multiplier), int(progressTextBoxWidth * multiplier), int(textBoxHeight * multiplier), int(fontSize * multiplier), color["transpBlack"]) + \
 	'		<convert type="ProgressToText">InText</convert>\n' + \
 	'	</widget>\n' + \
-	'	<widget source="progress_text" conditional="progress_text" render="Label" position="%d,%d" size="%d,%d" font="Regular;%d" halign="left" backgroundColor="%s">\n' % (int(progressPercentLeftAlign * multiplier), int(textBoxTopMargin * multiplier), int(progressPercentBoxWidth * multiplier), int(textBoxHeight * multiplier), int(fontSize * multiplier),  color["transpBlack"]) + \
+	'	<widget source="progress_text" conditional="progress_text" render="Label" position="%d,%d" size="%d,%d" font="Regular;%d" halign="left" backgroundColor="%s">\n' % (int(progressPercentLeftAlign * multiplier), int(textBoxTopMargin * multiplier), int(progressPercentBoxWidth * multiplier), int(textBoxHeight * multiplier), int(fontSize * multiplier), color["transpBlack"]) + \
 	'		<convert type="ProgressToText">InPercent</convert>\n' + \
 	'	</widget>\n' + \
 	'</screen>\n'
