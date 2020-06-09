@@ -190,4 +190,3 @@ class AutoScheduleTimer:
 		else:
 			scheduletext = ""
 		return scheduletext
-

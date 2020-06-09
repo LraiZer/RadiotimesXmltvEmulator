@@ -77,4 +77,3 @@ downloadBar = \
 	'</screen>\n'
 
 #  scrollbarMode="showNever" scrollbarWidth="0" scrollbarSliderForegroundColor="FF000000" scrollbarSliderBorderColor="FF000000"
-
