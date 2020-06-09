@@ -253,11 +253,11 @@ class RadioTimesEmulatorGUIScreen(ConfigListScreen, Screen):
 
 	def RadioTimesEmulatorCallback(self, answer=None):
 		print("[RadioTimesEmulatorGUI]answer", answer)
-		self["description"].setText(_("The download has completed.") + (self.scheduleInfo and " " + _("Next scheduled fetch is programmed for %s.") % self.scheduleInfo + " " or " ") +  _("Please don't forget that after downloading the first time the selected providers will need to be enabled in EPG-Importer plugin."))
+		self["description"].setText(_("The download has completed.") + (self.scheduleInfo and " " + _("Next scheduled fetch is programmed for %s.") % self.scheduleInfo + " " or " ") + _("Please don't forget that after downloading the first time the selected providers will need to be enabled in EPG-Importer plugin."))
 
 	def keySave(self):
 		self.saveAll()
-		self["description"].setText(_("The current configuration has been saved.") + (self.scheduleInfo and " " + _("Next scheduled fetch is programmed for %s.") % self.scheduleInfo + " " or " ") +  _("Please don't forget that after downloading the first time the selected providers will need to be enabled in EPG-Importer plugin."))
+		self["description"].setText(_("The current configuration has been saved.") + (self.scheduleInfo and " " + _("Next scheduled fetch is programmed for %s.") % self.scheduleInfo + " " or " ") + _("Please don't forget that after downloading the first time the selected providers will need to be enabled in EPG-Importer plugin."))
 
 	def keyOk(self):
 		if self["config"].getCurrent() and len(self["config"].getCurrent()) > 1 and self["config"].getCurrent()[1] == self.config.dayscreen:
