@@ -54,7 +54,7 @@ class Providers():
 
 	def read(self):
 		providers = {}
-		keys = [provider[1][:-5] for provider in crawlDirectory("%s/providers/" % (emulator_path), ".*\.conf$")]  # noqa: W605
+		keys = [provider[1][:-5] for provider in crawlDirectory("%s/providers/" % (emulator_path), r".*\.conf$")]
 		for key in keys:
 			conf = self.getConf(key)
 			if not conf:
