@@ -4,7 +4,7 @@
 #include "../epgdb/epgdb.h"
 #include "../core/dvb_text.h"
 
-char *genre[256];
+extern char *genre[256];
 
 void opentv_init ();
 void opentv_cleanup ();
