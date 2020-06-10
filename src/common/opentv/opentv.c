@@ -21,6 +21,11 @@
 #define MAX_SUMMARIE_SIZE	0x3FFF
 #define MAX_CHANNELS		0xFFFF
 
+char *genre[256];
+char provider[256];
+bool no_dvb_poll;
+bool carousel_dvb_poll;
+
 static epgdb_channel_t *channels[MAX_CHANNELS];
 char channels_name[MAX_CHANNELS][256];
 
