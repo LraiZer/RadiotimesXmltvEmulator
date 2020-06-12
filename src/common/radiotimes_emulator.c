@@ -407,7 +407,8 @@ int main (int argc, char **argv)
 				strcpy (provider, optarg);
 				break;
 			case 'k':
-				nice (atoi(optarg));
+				if (nice (atoi(optarg)))
+					printf ("nice %s\n", optarg);
 				break;
 			case 'c':
 				carousel_dvb_poll = true;
