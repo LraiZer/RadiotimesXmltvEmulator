@@ -64,7 +64,7 @@ config.plugins.RadioTimesEmulator.dayscreen = ConfigSelection(choices=[("1", _("
 config.plugins.RadioTimesEmulator.retry = ConfigNumber(default=30)
 config.plugins.RadioTimesEmulator.retrycount = NoSave(ConfigNumber(default=0))
 config.plugins.RadioTimesEmulator.days = ConfigSubDict()
-for i in range(len(days)):
+for i in list(range(len(days))):
 	config.plugins.RadioTimesEmulator.days[i] = ConfigEnableDisable(default=True)
 
 
