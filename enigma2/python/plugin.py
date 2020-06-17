@@ -171,12 +171,12 @@ class RadioTimesEmulatorGUIScreen(ConfigListScreen, Screen):
 			providers_tmp_configs[provider_config.getProvider()] = provider_config
 
 		# build providers configurations
-		for provider in self.providers.keys():
-			self.providers_configs[provider] = ConfigYesNo(default=provider in providers_tmp_configs.keys())
+		for provider in list(self.providers.keys()):
+			self.providers_configs[provider] = ConfigYesNo(default=provider in list(providers_tmp_configs.keys()))
 
 	def providerKeysInNameOrder(self, providers):
 		temp = []
-		for provider in providers.keys():
+		for provider in list(providers.keys()):
 			temp.append((provider, providers[provider]["name"]))
 		return [i[0] for i in sorted(temp, key=lambda p: p[1].lower().decode('ascii', 'ignore'))]
 
@@ -304,7 +304,7 @@ class RadioTimesEmulatorDaysScreen(ConfigListScreen, Screen):
 		self.skinName = ["Setup"]
 		self.config = config.plugins.RadioTimesEmulator
 		self.list = []
-		for i in sorted(self.config.days.keys()):
+		for i in sorted(list(self.config.days.keys())):
 			self.list.append(getConfigListEntry(days[i], self.config.days[i]))
 		ConfigListScreen.__init__(self, self.list)
 		self["key_red"] = StaticText(_("Cancel"))
