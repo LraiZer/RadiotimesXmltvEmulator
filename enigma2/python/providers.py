@@ -7,7 +7,7 @@ emulator_path = "/usr/radiotimes_emulator"
 epg_import_sources_path = "/etc/epgimport"
 
 
-class Providers():
+class Providers(object):
 
 	def providerFileExists(self, key):
 		filename = "%s/providers/%s.conf" % (emulator_path, key)
@@ -66,7 +66,7 @@ class Providers():
 		return providers
 
 
-class ProviderConfig():
+class ProviderConfig(object):
 
 	def __init__(self, value=""):
 		self.provider = value

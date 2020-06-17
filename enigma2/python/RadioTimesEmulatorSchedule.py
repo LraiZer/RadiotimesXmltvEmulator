@@ -56,7 +56,7 @@ def Scheduleautostart(reason, session=None, **kwargs):
 			autoScheduleTimer.schedulestop()
 
 
-class AutoScheduleTimer:
+class AutoScheduleTimer(object):
 	instance = None
 
 	def __init__(self, session):
