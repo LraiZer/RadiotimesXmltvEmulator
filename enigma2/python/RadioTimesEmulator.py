@@ -23,6 +23,11 @@ from enigma import eDVBResourceManager, eTimer, eDVBFrontendParameters, eDVBFron
 from .providers import Providers, emulator_path, epg_import_sources_path, ProviderConfig
 
 import re
+import sys
+
+PY3 = sys.version_info.major >= 3
+if PY3:
+	import six
 
 from .RadioTimesEmulatorSkin import downloadBar
 
@@ -441,6 +446,9 @@ class RadioTimesEmulatorDisplayOutput(Console):
 		from Screens.Standby import inStandby
 		if not inStandby:
 			# self["text"].appendText(str) # Appending to this variable crashes OpenATV (ScrollLabel.py) if the variable is not used in the skin
-			str_no_date = re.sub(r'[0-9]+\/[0-9]+\/[0-9]+\s[0-9]+[:][0-9]+[:][0-9]+', '', str).strip()
+			if PY3:
+				str_no_date = re.sub(r'[0-9]+\/[0-9]+\/[0-9]+\s[0-9]+[:][0-9]+[:][0-9]+', '', six.ensure_str(str)).strip()
+			else:
+				str_no_date = re.sub(r'[0-9]+\/[0-9]+\/[0-9]+\s[0-9]+[:][0-9]+[:][0-9]+', '', str).strip()
 			if str_no_date:
 				self["actionLong"].setText("%s%s" % (self.prefix, re.sub(r'\s\s+', ".. ", str_no_date)))

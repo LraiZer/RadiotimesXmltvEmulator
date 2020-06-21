@@ -27,6 +27,12 @@ except:
 	def getImageDistro():
 		return "UNKNOWN"
 
+import sys
+
+PY3 = sys.version_info.major >= 3
+if PY3:
+	import six
+
 # from this plugin
 from .providers import Providers, emulator_path, ProviderConfig
 from .RadioTimesEmulator import RadioTimesEmulator
@@ -179,7 +185,10 @@ class RadioTimesEmulatorGUIScreen(ConfigListScreen, Screen):
 		temp = []
 		for provider in list(providers.keys()):
 			temp.append((provider, providers[provider]["name"]))
-		return [i[0] for i in sorted(temp, key=lambda p: p[1].lower().decode('ascii', 'ignore'))]
+		if PY3:
+			return [i[0] for i in sorted(temp, key=lambda p: six.ensure_binary(p[1]).lower().decode('ascii', 'ignore'))]
+		else:
+			return [i[0] for i in sorted(temp, key=lambda p: p[1].lower().decode('ascii', 'ignore'))]
 
 	def createSetup(self):
 		indent = "- "
