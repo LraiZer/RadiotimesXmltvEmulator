@@ -27,17 +27,17 @@ except:
 	def getImageDistro():
 		return "UNKNOWN"
 
-import sys
-
-PY3 = sys.version_info.major >= 3
-if PY3:
-	import six
-
 # from this plugin
 from .providers import Providers, emulator_path, ProviderConfig
 from .RadioTimesEmulator import RadioTimesEmulator
 from .RadioTimesEmulatorSchedule import AutoScheduleTimer, Scheduleautostart
 from .about import RadioTimesEmulatorAbout
+
+import sys
+
+PY3 = sys.version_info.major >= 3
+if PY3:
+	import six
 
 paths = []
 default_path = ""

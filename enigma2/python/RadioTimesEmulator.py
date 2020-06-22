@@ -20,7 +20,9 @@ from Tools.Directories import pathExists
 
 from enigma import eDVBResourceManager, eTimer, eDVBFrontendParameters, eDVBFrontendParametersSatellite
 
+# from this plugin
 from .providers import Providers, emulator_path, epg_import_sources_path, ProviderConfig
+from .RadioTimesEmulatorSkin import downloadBar
 
 import re
 import sys
@@ -28,8 +30,6 @@ import sys
 PY3 = sys.version_info.major >= 3
 if PY3:
 	import six
-
-from .RadioTimesEmulatorSkin import downloadBar
 
 
 class RadioTimesEmulator(Screen):
