@@ -116,8 +116,7 @@ install-gui:
 	install -m 644 locale/th/LC_MESSAGES/RadioTimesEmulator.mo $(D)${libdir}/enigma2/python/Plugins/SystemPlugins/RadioTimesEmulator/locale/th/LC_MESSAGES/
 	install -m 644 locale/tr/LC_MESSAGES/RadioTimesEmulator.mo $(D)${libdir}/enigma2/python/Plugins/SystemPlugins/RadioTimesEmulator/locale/tr/LC_MESSAGES/
 	install -m 644 locale/uk/LC_MESSAGES/RadioTimesEmulator.mo $(D)${libdir}/enigma2/python/Plugins/SystemPlugins/RadioTimesEmulator/locale/uk/LC_MESSAGES/
-	install -m 644 enigma2/python/*.py $(D)${libdir}/enigma2/python/Plugins/SystemPlugins/RadioTimesEmulator/
-	install -m 644 enigma2/python/*.pyo $(D)${libdir}/enigma2/python/Plugins/SystemPlugins/RadioTimesEmulator/
+	install -m 644 enigma2/python/*.py* $(D)${libdir}/enigma2/python/Plugins/SystemPlugins/RadioTimesEmulator/
 	install -m 644 enigma2/python/LICENSE $(D)${libdir}/enigma2/python/Plugins/SystemPlugins/RadioTimesEmulator/
 	install -m 644 enigma2/python/LICENSE.GPLv2 $(D)${libdir}/enigma2/python/Plugins/SystemPlugins/RadioTimesEmulator/
 	install -m 644 enigma2/python/README.txt $(D)${libdir}/enigma2/python/Plugins/SystemPlugins/RadioTimesEmulator/
