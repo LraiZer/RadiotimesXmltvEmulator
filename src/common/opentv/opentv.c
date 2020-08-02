@@ -158,11 +158,6 @@ bool opentv_read_channels_bat (unsigned char *data, unsigned int length, char *d
 		unsigned short int transport_descriptor_length = ((data[offset1 + 4] & 0x0f) << 8) | data[offset1 + 5];
 		unsigned int offset2 = offset1 + 6;
 
-		// 7e3 tsid is unique in Enigma2 hardcoding for 282, we dont pull transponder data so hardcode current :(
-		// Transport.name_space |= ((Transport.frequency/1000)*10) + Transport.polarization
-		if (nid == 0x2 && tid == 0x7e3)
-			name_space |= 0x2f26;
-
 		offset1 += (transport_descriptor_length + 6);
 		transport_stream_loop_length -= (transport_descriptor_length + 6);
 		
